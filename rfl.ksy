@@ -76,7 +76,7 @@ types:
             'rfl_section_type::v3d_unknown': rfl_v3d_files
             'rfl_section_type::vfx_unknown': rfl_vfx_files
             # 'rfl_section_type::eax_effects': 
-            # 'rfl_section_type::unknown2': 
+            'rfl_section_type::waypoint_lists': rfl_waypoint_lists
             # 'rfl_section_type::nav_points': 
             'rfl_section_type::entities': rfl_entities
             'rfl_section_type::items': rfl_items
@@ -573,6 +573,25 @@ types:
         type: u4
         repeat: expr
         repeat-expr: vfx_files_count
+  rfl_waypoint_lists:
+    seq:
+      - id: count
+        type: u4
+      - id: waypoint_lists
+        type: rfl_waypoint_list
+        repeat: expr
+        repeat-expr: count
+  rfl_waypoint_list:
+    seq:
+      - id: name
+        type: rfl_string
+      - id: count
+        type: u4
+      - id: waypoints
+        type: u4
+        repeat: expr
+        repeat-expr: count
+        doc: probably index in waypoints objects array
   rfl_level_properies:
     seq:
       - id: geomod_texture
@@ -1174,7 +1193,7 @@ enums:
     0x00007003: v3d_unknown
     0x00007004: vfx_unknown
     0x00008000: eax_effects
-    0x00010000: unknown2
+    0x00010000: waypoint_lists
     0x00020000: nav_points
     0x00030000: entities
     0x00040000: items
