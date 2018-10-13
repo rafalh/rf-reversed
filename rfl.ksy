@@ -51,10 +51,10 @@ types:
           switch-on: type
           cases:
             'rfl_section_type::static_geometry': rfl_rooms_sect
-            # 'rfl_section_type::geo_regions': 
+            'rfl_section_type::geo_regions': rfl_geo_regions
             'rfl_section_type::lights': rfl_lights
             'rfl_section_type::cutscene_cameras': rfl_cutscene_cameras
-            # 'rfl_section_type::ambient_sounds': 
+            'rfl_section_type::ambient_sounds': rfl_ambient_sounds
             'rfl_section_type::events': rfl_events
             'rfl_section_type::mp_respawns': rfl_mp_respawns
             'rfl_section_type::level_properties': rfl_level_properties
@@ -85,7 +85,8 @@ types:
             'rfl_section_type::player_start': rfl_player_start
             'rfl_section_type::level_info': rfl_level_info
             'rfl_section_type::brushes': rfl_brushes_sect
-            # 'rfl_section_type::groups': 
+            #'rfl_section_type::groups': rfl_groups
+            'rfl_section_type::editor_only_lights': rfl_lights
   rfl_string:
     doc: variable-length string
     seq:
@@ -147,6 +148,44 @@ types:
         type: f4
       - id: fog_far_plane
         type: f4
+  rfl_geo_regions:
+    seq:
+      - id: count
+        type: u4
+      - id: geo_regions
+        type: rfl_geo_region
+        repeat: expr
+        repeat-expr: count
+  rfl_geo_region:
+    seq:
+      - id: uid
+        type: u4
+      - id: flags
+        type: u2
+        enum: rfl_geo_region_flags
+      - id: hardness
+        type: u2
+        doc: in range 0-100
+      - id: shallow_geomod_depth
+        type: f4
+        if: flags.to_i & rfl_geo_region_flags::use_shallow_geomods.to_i != 0
+      - id: pos
+        type: rfl_vec3
+      - id: rot
+        type: rfl_mat3
+        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+      - id: width
+        type: f4
+        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+      - id: height
+        type: f4
+        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+      - id: depth
+        type: f4
+        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+      - id: radius
+        type: f4
+        if: flags.to_i & rfl_geo_region_flags::sphere.to_i != 0
   rfl_lights:
     seq:
       - id: count
@@ -162,12 +201,35 @@ types:
       - id: class_name
         type: rfl_string
         doc: "Light"
-      - id: unknown
-        size: 48
+      - id: pos
+        type: rfl_vec3
+      - id: rot
+        type: rfl_mat3
       - id: script_name
         type: rfl_string
+      - id: reserved
+        type: u1
+      - id: flags
+        type: u4
+        enum: rfl_light_flags
+      - id: color
+        type: rfl_color
+      - id: range
+        type: f4
+      - id: fov
+        type: f4
+      - id: fov_dropoff
+        type: f4
+      - id: intensity_at_max_range
+        type: f4
+      - id: unknown1
+        type: f4
+      - id: tube_light_width
+        type: f4
+      - id: light_on_intensity
+        type: f4
       - id: unknown2
-        size: 57
+        size: 20
   rfl_events:
     seq:
       - id: count
@@ -353,7 +415,7 @@ types:
   rfl_rooms_sect:
     seq:
       - id: unknown
-        size: _root.header.version > 0xB4 ? 10 : 6
+        size: "_root.header.version > 0xB4 ? 10 : 6"
       - id: textures_count
         type: u4
       - id: textures
@@ -568,6 +630,32 @@ types:
       - id: unknown2
         type: u1
         doc: 0x00
+  rfl_ambient_sounds:
+    seq:
+      - id: count
+        type: u4
+      - id: ambient_sounds
+        type: rfl_ambient_sound
+        repeat: expr
+        repeat-expr: count
+  rfl_ambient_sound:
+    seq:
+      - id: uid
+        type: u4
+      - id: pos
+        type: rfl_vec3
+      - id: unknown
+        type: u1
+      - id: sound_file_name
+        type: rfl_string
+      - id: min_dist
+        type: f4
+      - id: volume_scale
+        type: f4
+      - id: rolloff
+        type: f4
+      - id: start_delay_ms
+        type: u4
   rfl_mp_respawns:
     seq:
       - id: count
@@ -693,8 +781,10 @@ types:
         type: u1
       - id: cooperation
         type: u4
+        enum: rfl_entity_cooperation
       - id: friendliness
         type: u4
+        enum: rfl_entity_friendliness
       - id: team_id
         type: u4
       - id: waypoint_list
@@ -752,8 +842,10 @@ types:
         type: rfl_string
       - id: ai_mode
         type: u1
+        enum: rfl_entity_ai_mode
       - id: ai_attack_style
         type: u1
+        enum: rfl_entity_ai_attack_style
       - id: unknown4
         size: 4
       - id: turret_uid
@@ -841,7 +933,7 @@ types:
         type: rfl_mat3
       - id: script_name
         type: rfl_string
-      - id: zero
+      - id: reserved
         type: u1
         doc: 0x00
       - id: count
@@ -1027,6 +1119,31 @@ types:
       - id: unknown4
         type: u4
         doc: 3? 0?
+  rfl_groups:
+    seq:
+      - id: count
+        type: u4
+      - id: groups
+        type: rfl_group
+        repeat: expr
+        repeat-expr: count
+  rfl_group:
+    seq:
+      - id: name
+        type: rfl_string
+      - id: unknown1
+        type: u1
+      - id: unknown2_moving
+        type: u1
+      - id: unknown3
+        type: u4
+      - id: count
+        type: u4
+      - id: uids
+        type: u4
+        repeat: expr
+        repeat-expr: count
+
 enums:
   rfl_section_type:
     0x00000000: end
@@ -1041,6 +1158,7 @@ enums:
     0x00000a00: particle_emitters
     0x00000b00: gas_regions
     0x00000c00: room_effects
+    0x00000d00: climbing_regions
     0x00000e00: bolt_emitters
     0x00000f00: targets
     0x00001000: decals
@@ -1066,6 +1184,7 @@ enums:
     0x01000000: level_info
     0x02000000: brushes
     0x03000000: groups
+    0x04000000: editor_only_lights
   rfl_face_flags:
     0x01: show_sky
     0x02: mirrored
@@ -1079,3 +1198,36 @@ enums:
     0x2:  air
     0x4:  detail
     0x10: emit_steam
+  rfl_geo_region_flags:
+    0x02: sphere
+    0x04: unk
+    0x20: use_shallow_geomods
+    0x40: is_ice
+  rfl_light_flags:
+    0x1:   dynamic
+    0x4:   shadow_casting
+    0x8:   is_enabled
+    0x10:  omnidirectional
+    0x20:  circular_spotlight
+    #0x30:  tube_light
+    0x200: unknown
+  rfl_entity_ai_mode:
+    0: catatonic
+    1: waiting
+    2: waypoints
+    3: collecting
+    4: motion_detection
+  rfl_entity_ai_attack_style:
+    0: default
+    1: evasive
+    2: direct
+    3: stand_ground
+  rfl_entity_cooperation:
+    0: uncooperative
+    1: species_cooperative
+    2: cooperative
+  rfl_entity_friendliness:
+    0: unfriendly
+    1: neutral
+    2: friendly
+    3: outcast
