@@ -58,14 +58,14 @@ types:
             'section_type::events': events_section
             'section_type::mp_respawns': mp_respawns_section
             'section_type::level_properties': level_properties_section
-            # 'section_type::particle_emitters': 
+            'section_type::particle_emitters': particle_emitters_section
             'section_type::gas_regions': gas_regions_section
             # 'section_type::room_effects': 
             'section_type::climbing_regions': climbing_regions_section
             'section_type::bolt_emitters': bolt_emitter_section
-            # 'section_type::targets': 
-            # 'section_type::decals': 
-            # 'section_type::push_regions': 
+            'section_type::targets': targets_section
+            'section_type::decals': decals_section
+            'section_type::push_regions': push_regions_section
             'section_type::lightmaps': lightmaps_section
             # 'section_type::movers': 
             # 'section_type::moving_groups': 
@@ -580,6 +580,96 @@ types:
         type: f4
       - id: fog_far_plane
         type: f4
+  # Particle Emitters
+  particle_emitters_section:
+    seq:
+      - id: count
+        type: u4
+      - id: particle_emitters
+        type: particle_emitter
+        repeat: expr
+        repeat-expr: count
+  particle_emitter:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Particle Emitter"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Particle Emitter"
+      - id: unknown
+        type: u1
+      - id: shape
+        type: u4
+        enum: particle_emitter_shape
+      - id: sphere_radius
+        type: f4
+      - id: plane_width
+        type: f4
+      - id: plane_depth
+        type: f4
+      - id: texture
+        type: vstring
+      - id: spawn_delay
+        type: f4
+      - id: spawn_randomize
+        type: f4
+      - id: velocity
+        type: f4
+      - id: velocity_randomize
+        type: f4
+      - id: acceleration
+        type: f4
+      - id: decay
+        type: f4
+      - id: decay_randomize
+        type: f4
+      - id: particle_radius
+        type: f4
+      - id: particle_radius_randomize
+        type: f4
+      - id: growth_rate
+        type: f4
+      - id: gravity_multiplier
+        type: f4
+      - id: random_direction
+        type: f4
+      - id: particle_color
+        type: color
+      - id: fade_to_color
+        type: color
+      - id: emitter_flags
+        type: u4
+        enum: particle_emitter_flags
+      - id: particle_flags
+        type: u2
+        enum: particle_flags
+      - id: stickieness
+        type: b4
+      - id: bounciness
+        type: b4
+      - id: push_effect
+        type: b4
+      - id: swirliness
+        type: b4
+      - id: unk
+        type: u1
+      - id: time_on
+        type: f4
+      - id: time_on_randomize
+        type: f4
+      - id: time_off
+        type: f4
+      - id: time_off_randomize
+        type: f4
+      - id: active_distance
+        type: f4
   # Gas Regions
   gas_regions_section:
     seq:
@@ -639,15 +729,22 @@ types:
         type: u4
       - id: class_name
         type: vstring
-        doc: "Climbing Region"
+        doc: always "Climbing Region"
       - id: pos
         type: vec3
       - id: rot
         type: mat3
       - id: script_name
         type: vstring
-      - id: unknown2
-        size: 17
+        doc: always "Climbing Region"
+      - id: hidden_in_editor
+        type: u1
+        doc: 0 or 1
+      - id: type
+        type: u4
+        enum: climbing_region_type
+      - id: extents
+        type: vec3
   # Bolt Emitters
   bolt_emitter_section:
     seq:
@@ -671,21 +768,151 @@ types:
       - id: script_name
         type: vstring
         doc: always "Bolt Emitter"
-      - id: unknown2
-        size: 45
-      - id: image
+      - id: unknown
+        type: u1
+      - id: target_uid
+        type: s4
+      - id: src_ctrl_dist
+        type: f4
+      - id: trg_ctrl_dist
+        type: f4
+      - id: thickness
+        type: f4
+      - id: jitter
+        type: f4
+      - id: segments_count
+        type: u4
+      - id: spawn_delay
+        type: f4
+      - id: spawn_delay_randomize
+        type: f4
+      - id: decay
+        type: f4
+      - id: decay_randomize
+        type: f4
+      - id: color
+        type: color
+      - id: texture
         type: vstring
-      - id: unknown3
-        size: 5
+      - id: flags
+        type: u4
+        enum: bolt_emitter_flags
+      - id: initially_on
+        type: u1
+        doc: 0 or 1
+  # Targets
+  targets_section:
+    seq:
+      - id: count
+        type: u4
+      - id: targets
+        type: target
+        repeat: expr
+        repeat-expr: count
+  target:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Target"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Target"
+      - id: unknown
+        type: u1
+  # Decals
+  decals_section:
+    seq:
+      - id: count
+        type: u4
+      - id: decals
+        type: decal
+        repeat: expr
+        repeat-expr: count
+  decal:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Decal"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Decal"
+      - id: unknown
+        type: u1
+      - id: extents
+        type: vec3
+      - id: texture
+        type: vstring
+      - id: alpha
+        type: u4
+      - id: self_illuminated
+        type: u1
+      - id: tiling
+        type: u4
+        enum: decal_tiling
+      - id: scale
+        type: f4
+  # Push Regions
+  push_regions_section:
+    seq:
+      - id: count
+        type: u4
+      - id: push_regions
+        type: push_region
+        repeat: expr
+        repeat-expr: count
+  push_region:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Push Region"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Push Region"
+      - id: unknown
+        type: u1
+      - id: shape
+        type: u4
+        enum: push_region_shape
+      - id: extents
+        type: vec3
+        if: shape != push_region_shape::sphere
+      - id: radius
+        type: f4
+        if: shape == push_region_shape::sphere
+      - id: strength
+        type: f4
+      - id: flags
+        type: u2
+        enum: push_region_flags
+      - id: turbulence
+        type: u2
   # Lightmaps
   lightmaps_section:
     seq:
-      - id: lightmaps_count
+      - id: count
         type: u4
       - id: lightmaps
         type: lightmap
         repeat: expr
-        repeat-expr: lightmaps_count
+        repeat-expr: count
   lightmap:
     seq:
       - id: w
@@ -1423,3 +1650,47 @@ enums:
   gas_region_shape:
     1: sphere
     2: box
+  particle_emitter_shape:
+    1: plane
+    2: sphere
+  particle_emitter_flags:
+    0x04: force_spawn_every_frame
+    0x08: direction_dependent_velocity
+    0x10: emitter_initially_on
+    0x20: unknown
+  particle_flags:
+    0x0002: glow
+    0x0004: fade
+    0x0008: gravity
+    0x0010: collide_with_world
+    0x0040: unknown
+    0x0080: explode_on_impact
+    0x0100: loop_anim
+    0x0200: random_orient
+    0x0400: collide_with_liquids
+    0x0800: die_on_impact
+    0x1000: play_collision_sound
+  decal_tiling:
+    0: none
+    1: u
+    2: v
+  push_region_shape:
+    1: sphere
+    2: axis_aligned_box
+    3: oriented_box
+  push_region_flags:
+    0x01: mass_independent
+    0x02: grounded
+    0x04: grows_towards_region_center
+    0x08: grows_towards_region_boundaries
+    0x10: radial
+    0x20: doesnt_affect_player
+    0x40: jump_pad
+  climbing_region_type:
+    1: ladder
+    2: chain_fence
+  bolt_emitter_flags:
+    0x2: fade
+    0x4: glow
+    0x8: src_dir_lock
+    0x10: trg_dir_lock
