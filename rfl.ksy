@@ -278,12 +278,8 @@ types:
         type: rfl_string
       - id: str2
         type: rfl_string
-      - id: links_count
-        type: u4
       - id: links
-        type: u4
-        repeat: expr
-        repeat-expr: links_count
+        type: rfl_uid_list
       - id: rot
         type: rfl_mat3
         if: class_name.str == "Alarm" or class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player"
@@ -328,7 +324,7 @@ types:
         type: f4
         if: liquid_room == 1
       - id: liquid_color
-        type: u4
+        type: rfl_color
         if: liquid_room == 1
       - id: liquid_surface_texture
         type: rfl_string
@@ -356,7 +352,7 @@ types:
         type: f4
         if: liquid_room == 1
       - id: ambient_color
-        type: u4
+        type: rfl_color
         if: ambient_light == 1
   rfl_vertex:
     seq:
@@ -742,11 +738,11 @@ types:
       - id: hardness
         type: u4
       - id: ambient_color
-        type: u4
+        type: rfl_color
       - id: unknown
         type: u1
       - id: fog_color
-        type: u4
+        type: rfl_color
       - id: fog_near_plane
         type: f4
       - id: fog_far_plane
@@ -1082,7 +1078,6 @@ types:
         type: u4
       - id: team_id
         type: u4
-  
   rfl_clutters:
     seq:
       - id: count
@@ -1108,12 +1103,8 @@ types:
         size: 5
       - id: skin
         type: rfl_string
-      - id: links_count
-        type: u4
       - id: links
-        type: u4
-        repeat: expr
-        repeat-expr: links_count
+        type: rfl_uid_list
   rfl_triggers:
     seq:
       - id: count
@@ -1202,12 +1193,8 @@ types:
       - id: unknown5
         type: u4
         doc: 0xFFFFFFFF
-      - id: links_count
-        type: u4
       - id: links
-        type: u4
-        repeat: expr
-        repeat-expr: links_count
+        type: rfl_uid_list
   rfl_brushes_sect:
     seq:
       - id: brushes_count
