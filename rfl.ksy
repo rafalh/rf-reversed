@@ -50,7 +50,7 @@ types:
         type:
           switch-on: type
           cases:
-            'section_type::static_geometry': rooms_section
+            'section_type::static_geometry': geometry
             'section_type::geo_regions': geo_regions_section
             'section_type::lights': lights_section
             'section_type::cutscene_cameras': cutscene_cameras_section
@@ -216,7 +216,7 @@ types:
     seq:
       - id: index
         type: u4
-        doc: index in rooms_section::vertices
+        doc: index in geometry::vertices
       - id: tex_u
         type: f4
       - id: tex_v
@@ -276,7 +276,7 @@ types:
       - id: vv
         type: f4
         doc: V velocity
-  rooms_section:
+  geometry:
     seq:
       - id: unknown
         size: "_root.header.version > 0xB4 ? 10 : 6"
@@ -1621,39 +1621,14 @@ types:
         type: vec3
       - id: rot
         type: mat3
-      - id: unknown1
-        size: 10
-        doc: 00 00 ...
-      - id: textures_count
-        type: u4
-      - id: textures
-        type: vstring
-        repeat: expr
-        repeat-expr: textures_count
-      - id: unknown2
-        size: 16
-        doc: 00 00 ...
-      - id: vertices_count
-        type: u4
-      - id: vertices
-        type: vec3
-        repeat: expr
-        repeat-expr: vertices_count
-      - id: faces_count
-        type: u4
-      - id: faces
-        type: face
-        repeat: expr
-        repeat-expr: faces_count
-      - id: unknown3
-        type: u4
-        doc: typically 0
+      - id: geometry
+        type: geometry
       - id: flags
         type: u4
         enum: brush_flags
       - id: life
         type: s4
-      - id: unknown4
+      - id: unknown
         type: u4
         doc: 3? 0?
   # Groups
