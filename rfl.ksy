@@ -78,7 +78,7 @@ types:
             'rfl_section_type::vfx_unknown': rfl_vfx_files
             # 'rfl_section_type::eax_effects': 
             'rfl_section_type::waypoint_lists': rfl_waypoint_lists
-            # 'rfl_section_type::nav_points': 
+            'rfl_section_type::nav_points': rfl_nav_points
             'rfl_section_type::entities': rfl_entities
             'rfl_section_type::items': rfl_items
             'rfl_section_type::clutters':  rfl_clutters
@@ -132,6 +132,15 @@ types:
         type: u1
       - id: a
         type: u1
+  rfl_uid_list:
+    seq:
+      - id: count
+        type: u4
+      - id: uids
+        type: u4
+        repeat: expr
+        repeat-expr: count
+
   # Sections
   rfl_level_properties:
     seq:
@@ -671,6 +680,61 @@ types:
         repeat: expr
         repeat-expr: count
         doc: probably index in waypoints objects array
+  rfl_nav_points:
+    seq:
+      - id: count
+        type: u4
+      - id: nav_points
+        type: rfl_nav_point
+        repeat: expr
+        repeat-expr: count
+      - id: nav_point_connections
+        type: rfl_nav_point_connections
+        repeat: expr
+        repeat-expr: count
+  rfl_nav_point:
+    seq:
+      - id: uid
+        type: u4
+      - id: unknown
+        type: u1
+        doc: typically 0
+      - id: height
+        type: f4
+      - id: pos
+        type: rfl_vec3
+      - id: radius
+        type: f4
+      - id: type
+        type: u4
+        enum: rfl_nav_point_type
+      - id: directional
+        type: u1
+        doc: 0 or 1
+      - id: rot
+        type: rfl_mat3
+        if: directional != 0
+      - id: unknown2
+        type: u1
+        doc: typically 0
+      - id: unknown3
+        type: u1
+        doc: typically 0
+      - id: crunch
+        type: u1
+        doc: 0 or 1
+      - id: pause_time
+        type: f4
+      - id: links
+        type: rfl_uid_list
+  rfl_nav_point_connections:
+    seq:
+      - id: count
+        type: u1
+      - id: indices
+        type: u4
+        repeat: expr
+        repeat-expr: count
   rfl_level_properies:
     seq:
       - id: geomod_texture
@@ -832,28 +896,6 @@ types:
         type: rfl_string
       - id: unknown3
         size: 5
-  rfl_nav_points:
-    seq:
-      - id: nav_points_count
-        type: u4
-      - id: nav_points
-        type: rfl_nav_point
-        repeat: expr
-        repeat-expr: nav_points_count
-      - id: unknown
-        type: u2
-  rfl_nav_point:
-    seq:
-      - id: uid
-        type: u4
-      - id: unknown
-        size: 33
-      - id: links_count
-        type: u4
-      - id: links
-        type: u4
-        repeat: expr
-        repeat-expr: links_count
   rfl_entities:
     seq:
       - id: count
@@ -1330,3 +1372,6 @@ enums:
     1: neutral
     2: friendly
     3: outcast
+  rfl_nav_point_type:
+    0: walking
+    1: flying
