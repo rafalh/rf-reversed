@@ -38,6 +38,7 @@ types:
         type: vstring
       - id: mod_name
         type: vstring
+        if: version >= 0xB2
   section:
     seq:
       - id: type
@@ -178,6 +179,7 @@ types:
         doc: -1.0f == infinite
       - id: eax_effect
         type: vstring
+        if: _root.header.version >= 0xB4
       - id: liquid_depth
         type: f4
         if: liquid_room == 1
@@ -236,11 +238,11 @@ types:
         type: f4
       - id: lm_u
         type: f4
-        if: _parent.lm_unknown2 != 0xFFFFFFFF
+        if: _parent.as<face>.lm_unknown2 != -1
         doc: lightmap U
       - id: lm_v
         type: f4
-        if: _parent.lm_unknown2 != 0xFFFFFFFF
+        if: _parent.as<face>.lm_unknown2 != -1
         doc: lightmap V
   face:
     seq:
@@ -252,8 +254,8 @@ types:
       - id: texture
         type: u4
       - id: lm_unknown2
-        type: u4
-        doc: if not 0xFFFFFFFF vertex has lightmap coordinates; it's not lightmap id
+        type: s4
+        doc: if not -1 vertex has lightmap coordinates; it's not lightmap id
       - id: unknown3
         type: u4
         doc: face id? sometimes is repeated.
@@ -272,7 +274,7 @@ types:
       - id: unknown6
         size: 6
       - id: room_index
-        type: u4
+        type: s4
       - id: vertices_count
         type: u4
       - id: vertices
@@ -292,7 +294,7 @@ types:
   geometry:
     seq:
       - id: unknown
-        size: "_root.header.version > 0xB4 ? 10 : 6"
+        size: "_root.header.version >= 0xC8 ? 10 : 6"
       - id: textures_count
         type: u4
       - id: textures
@@ -301,10 +303,15 @@ types:
         repeat-expr: textures_count
       - id: scroll_count
         type: u4
+        if: _root.header.version > 0xB4
       - id: scroll
         type: face_scroll
         repeat: expr
         repeat-expr: scroll_count
+        if: _root.header.version > 0xB4
+      - id: unknown_up_to_b4
+        type: u4
+        if: _root.header.version <= 0xB4
       - id: rooms_count
         type: u4
         doc: only compiled geometry
@@ -346,6 +353,14 @@ types:
       - id: unknown5
         type: u4
         if: _root.header.version == 0xB4
+      - id: legacy_scroll_count
+        type: u4
+        if: _root.header.version <= 0xB4
+      - id: legacy_scroll
+        type: face_scroll
+        repeat: expr
+        repeat-expr: scroll_count
+        if: _root.header.version <= 0xB4
   rooms_unk:
     seq:
       - id: mesh_index
@@ -548,9 +563,10 @@ types:
         type: uid_list
       - id: rot
         type: mat3
-        if: class_name.str == "Alarm" or class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player"
+        if: (_root.header.version >= 0x91 and (class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player")) or (_root.header.version >= 0x98 and class_name.str == "Alarm")
       - id: color
         type: color
+        if: _root.header.version >= 0xB0
   # Multiplayer Respawn Points
   mp_respawns_section:
     seq:
