@@ -1372,6 +1372,7 @@ types:
         doc: 0 or 1
       - id: unknown
         type: u4
+        doc: typically 0
       - id: skin
         type: vstring
       - id: links
@@ -1395,18 +1396,14 @@ types:
       - id: hidden_in_editor
         type: u1
         doc: 0 or 1
-      - id: is_box
-        type: u1
-        doc: 1 or 0
-      - id: unknown1
-        size: 3
+      - id: shape
+        type: u4
+        enum: trigger_shape
       - id: resets_after
         type: f4
       - id: resets_count
-        type: u2
-        doc: 0xFFFF - infinity
-      - id: unknown2
-        type: u2
+        type: s4
+        doc: -1 - infinity
       - id: is_use_key_required
         type: u1
         doc: 1 or 0
@@ -1415,7 +1412,7 @@ types:
       - id: weapon_activates
         type: u1
         doc: 1 or 0
-      - id: unknown3
+      - id: unknown1
         type: u1
       - id: is_npc
         type: u1
@@ -1430,31 +1427,31 @@ types:
         type: vec3
       - id: sphere_radius
         type: f4
-        if: is_box == 0
+        if: shape == trigger_shape::sphere
       - id: rot
         type: mat3
-        if: is_box != 0
+        if: shape != trigger_shape::sphere
       - id: box_height
         type: f4
-        if: is_box != 0
+        if: shape != trigger_shape::sphere
       - id: box_width
         type: f4
-        if: is_box != 0
+        if: shape != trigger_shape::sphere
       - id: box_depth
         type: f4
-        if: is_box != 0
+        if: shape != trigger_shape::sphere
       - id: one_way
         type: u1
-        if: is_box != 0
+        if: shape != trigger_shape::sphere
         doc: 1 or 0
       - id: airlock_room
-        type: u4
+        type: s4
         doc: UID
       - id: attached_to
-        type: u4
+        type: s4
         doc: UID
       - id: use_clutter
-        type: u4
+        type: s4
         doc: UID
       - id: disabled
         type: u1
@@ -1463,9 +1460,9 @@ types:
         type: f4
       - id: inside_time
         type: f4
-      - id: unknown4
-        type: u4
-        doc: 0xFFFFFFFF
+      - id: unknown2
+        type: s4
+        doc: typically -1
       - id: links
         type: uid_list
   # Player Start
@@ -1480,7 +1477,7 @@ types:
     seq:
       - id: unknown1
         type: u4
-        doc: 0x00000001
+        doc: typically 1
       - id: level_name
         type: vstring
       - id: author
@@ -1489,7 +1486,7 @@ types:
         type: vstring
       - id: unknown2
         type: u1
-        doc: 00
+        doc: typically 0
       - id: multiplayer_level
         type: u1
         doc: 0 or 1
@@ -1538,12 +1535,12 @@ types:
         repeat-expr: faces_count
       - id: unknown3
         type: u4
-        doc: 0
+        doc: typically 0
       - id: flags
         type: u4
         enum: brush_flags
       - id: life
-        type: u4
+        type: s4
       - id: unknown4
         type: u4
         doc: 3? 0?
@@ -1712,3 +1709,6 @@ enums:
     0x4: glow
     0x8: src_dir_lock
     0x10: trg_dir_lock
+  trigger_shape:
+    0: sphere
+    1: box
