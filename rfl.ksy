@@ -175,7 +175,7 @@ types:
         type: u1
       - id: life
         type: f4
-        doc: -1 == infinite
+        doc: -1.0f == infinite
       - id: eax_effect
         type: vstring
       - id: liquid_depth
@@ -1461,6 +1461,7 @@ types:
         type: f4
       - id: armor
         type: f4
+        doc: -1.0f if entity has no armor
       - id: fov
         type: u4
       - id: default_primary_weapon
@@ -1486,11 +1487,11 @@ types:
       - id: unknown3
         size: 4
       - id: turret_uid
-        type: u4
+        type: s4
       - id: alert_camera_uid
-        type: u4
+        type: s4
       - id: alarm_event_uid
-        type: u4
+        type: s4
       - id: run
         type: u1
         doc: 1 or 0
