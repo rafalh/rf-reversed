@@ -67,8 +67,8 @@ types:
             'section_type::decals': decals_section
             'section_type::push_regions': push_regions_section
             'section_type::lightmaps': lightmaps_section
-            # 'section_type::movers': 
-            # 'section_type::moving_groups': 
+            'section_type::movers': movers_section
+            'section_type::moving_groups': moving_groups_section
             'section_type::cutscenes': cutscenes_section
             'section_type::cutscene_path_nodes': cutscene_path_nodes_section
             'section_type::cutscene_paths': cutscene_paths_section
@@ -935,6 +935,118 @@ types:
       - id: bitmap
         size: w * h * 3
         doc: bitmap (24 bpp)
+  # Movers
+  movers_section:
+    seq:
+      - id: count
+        type: u4
+      - id: movers
+        type: brush
+        repeat: expr
+        repeat-expr: count
+  # Moving groups
+  moving_groups_section:
+    seq:
+      - id: count
+        type: u4
+      - id: moving_groups
+        type: moving_group
+        repeat: expr
+        repeat-expr: count
+  moving_group:
+    seq:
+      - id: name
+        type: vstring
+      - id: unknown
+        size: 2
+      - id: keyframes_count
+        type: u4
+      - id: keyframes
+        type: keyframe
+        repeat: expr
+        repeat-expr: keyframes_count
+      - id: unkown_count1
+        type: u4
+      - id: unkown2
+        size: unkown_count1 * 52
+        doc: clearly id, pos, rot; but why?
+      - id: is_door
+        type: u1
+        doc: 0 or 1
+      - id: rotate_in_place
+        type: u1
+        doc: 0 or 1
+      - id: starts_backwards
+        type: u1
+        doc: 0 or 1
+      - id: use_trav_time_as_spd
+        type: u1
+        doc: 0 or 1
+      - id: force_orient
+        type: u1
+        doc: 0 or 1
+      - id: no_player_collide
+        type: u1
+        doc: 0 or 1
+      - id: movement_type
+        type: u4
+        enum: movement_type
+      - id: starting_keyframe
+        type: u4
+      - id: start_sound
+        type: vstring
+      - id: start_vol
+        type: f4
+      - id: looping_sound
+        type: vstring
+      - id: looping_vol
+        type: f4
+      - id: stop_sound
+        type: vstring
+      - id: stop_vol
+        type: f4
+      - id: close_sound
+        type: vstring
+      - id: close_vol
+        type: f4
+      - id: unkown_count2
+        type: u4
+      - id: unkown3
+        size: unkown_count2 * 4
+        doc: seems to be ID, but with what purpose
+      - id: contents
+        type: uid_list
+  keyframe:
+    seq:
+      - id: uid
+        type: u4
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+      - id: hidden_in_editor
+        type: u1
+        doc: 0 or 1
+      - id: pause_time
+        type: f4
+      - id: depart_travel_time
+        type: f4
+      - id: return_travel_time
+        type: f4
+      - id: accel_time
+        type: f4
+      - id: decel_time
+        type: f4
+      - id: trigger_uid
+        type: s4
+      - id: contain_uid1
+        type: s4
+      - id: contain_uid2
+        type: s4
+      - id: degrees_about_axis
+        type: f4
   # Cutscenes
   cutscenes_section:
     seq:
@@ -1624,7 +1736,7 @@ enums:
     0x1:  portal
     0x2:  air
     0x4:  detail
-    0x10: emit_steam
+    0x10: emits_steam
   geo_region_flags:
     0x02: sphere
     0x04: unknown
@@ -1712,3 +1824,10 @@ enums:
   trigger_shape:
     0: sphere
     1: box
+  movement_type:
+    0: one_way
+    1: ping_pong_once
+    2: ping_pong_infinite
+    3: loop_once
+    4: loop_infinite
+    5: lift
