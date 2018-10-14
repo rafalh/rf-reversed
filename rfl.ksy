@@ -59,9 +59,10 @@ types:
             'section_type::mp_respawns': mp_respawns_section
             'section_type::level_properties': level_properties_section
             # 'section_type::particle_emitters': 
-            # 'section_type::gas_regions': 
+            'section_type::gas_regions': gas_regions_section
             # 'section_type::room_effects': 
-            # 'section_type::bolt_emitters': 
+            'section_type::climbing_regions': climbing_regions_section
+            'section_type::bolt_emitters': bolt_emitter_section
             # 'section_type::targets': 
             # 'section_type::decals': 
             # 'section_type::push_regions': 
@@ -583,10 +584,10 @@ types:
       - id: count
         type: u4
       - id: cutscenes
-        type: rfl_cutscene
+        type: cutscene
         repeat: expr
         repeat-expr: count
-  rfl_cutscene:
+  cutscene:
     seq:
       - id: uid
         type: u4
@@ -597,10 +598,10 @@ types:
       - id: shots_count
         type: u4
       - id: shots
-        type: rfl_cutscene_shot
+        type: cutscene_shot
         repeat: expr
         repeat-expr: shots_count
-  rfl_cutscene_shot:
+  cutscene_shot:
     seq:
       - id: camera_uid
         type: s4
@@ -643,10 +644,10 @@ types:
       - id: count
         type: u4
       - id: cutscene_paths
-        type: rfl_cutscene_path
+        type: cutscene_path
         repeat: expr
         repeat-expr: count
-  rfl_cutscene_path:
+  cutscene_path:
     seq:
       - id: name
         type: vstring
@@ -684,7 +685,7 @@ types:
         repeat: expr
         repeat-expr: count
       - id: nav_point_connections
-        type: rfl_nav_point_connections
+        type: nav_point_connections
         repeat: expr
         repeat-expr: count
   rfl_nav_point:
@@ -722,7 +723,7 @@ types:
         type: f4
       - id: links
         type: uid_list
-  rfl_nav_point_connections:
+  nav_point_connections:
     seq:
       - id: count
         type: u1
@@ -730,6 +731,14 @@ types:
         type: u4
         repeat: expr
         repeat-expr: count
+  lightmaps_section:
+    seq:
+      - id: lightmaps_count
+        type: u4
+      - id: lightmaps
+        type: lightmap
+        repeat: expr
+        repeat-expr: lightmaps_count
   lightmap:
     seq:
       - id: w
@@ -741,14 +750,6 @@ types:
       - id: bitmap
         size: w * h * 3
         doc: bitmap (24 bpp)
-  lightmaps_section:
-    seq:
-      - id: lightmaps_count
-        type: u4
-      - id: lightmaps
-        type: lightmap
-        repeat: expr
-        repeat-expr: lightmaps_count
   cutscene_cameras_section:
     seq:
       - id: count
@@ -801,7 +802,7 @@ types:
     seq:
       - id: count
         type: u4
-      - id: respawns
+      - id: mp_respawns
         type: mp_respawn
         repeat: expr
         repeat-expr: count
@@ -826,6 +827,14 @@ types:
         type: u1
       - id: bot
         type: u1
+  gas_regions_section:
+    seq:
+      - id: count
+        type: u4
+      - id: gas_regions
+        type: gas_region
+        repeat: expr
+        repeat-expr: count
   gas_region:
     seq:
       - id: uid
@@ -841,6 +850,14 @@ types:
         type: vstring
       - id: unknown2
         size: 17
+  climbing_regions_section:
+    seq:
+      - id: count
+        type: u4
+      - id: climbing_regions
+        type: climbing_region
+        repeat: expr
+        repeat-expr: count
   climbing_region:
     seq:
       - id: uid
@@ -856,19 +873,28 @@ types:
         type: vstring
       - id: unknown2
         size: 17
-  bolt_emiter:
+  bolt_emitter_section:
+    seq:
+      - id: count
+        type: u4
+      - id: bolt_emitters
+        type: bolt_emitter
+        repeat: expr
+        repeat-expr: count
+  bolt_emitter:
     seq:
       - id: uid
         type: u4
       - id: class_name
         type: vstring
-        doc: "Bolt Emiter"
+        doc: always "Bolt Emitter"
       - id: pos
         type: vec3
       - id: rot
         type: mat3
       - id: script_name
         type: vstring
+        doc: always "Bolt Emitter"
       - id: unknown2
         size: 45
       - id: image
