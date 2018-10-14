@@ -348,7 +348,7 @@ types:
     seq:
       - id: lightmap
         type: u4
-      - id: unk
+      - id: unknown
         size: 88
       - id: face
         type: u4
@@ -414,8 +414,9 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: reserved
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: flags
         type: u4
         enum: light_flags
@@ -453,13 +454,15 @@ types:
       - id: class_name
         type: vstring
         doc: "Cutscene Camera"
-      - id: unknown
-        size: 48
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
       - id: script_name
         type: vstring
-      - id: unknown2
+      - id: hidden_in_editor
         type: u1
-        doc: 0x00
+        doc: 0 or 1
   # Ambient Sounds
   ambient_sounds_section:
     seq:
@@ -475,8 +478,9 @@ types:
         type: u4
       - id: pos
         type: vec3
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: sound_file_name
         type: vstring
       - id: min_dist
@@ -506,8 +510,9 @@ types:
         type: vec3
       - id: script_name
         type: vstring
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: delay
         type: f4
       - id: bool1
@@ -552,9 +557,9 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: zero
+      - id: hidden_in_editor
         type: u1
-        doc: 0x00
+        doc: 0 or 1
       - id: team
         type: u4
       - id: red_team
@@ -603,8 +608,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Particle Emitter"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: shape
         type: u4
         enum: particle_emitter_shape
@@ -658,7 +664,7 @@ types:
         type: b4
       - id: swirliness
         type: b4
-      - id: unk
+      - id: unknown
         type: u1
       - id: time_on
         type: f4
@@ -693,8 +699,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Gas Region"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: shape
         type: u4
         enum: gas_region_shape
@@ -768,8 +775,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Bolt Emitter"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: target_uid
         type: s4
       - id: src_ctrl_dist
@@ -823,8 +831,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Target"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
   # Decals
   decals_section:
     seq:
@@ -848,8 +857,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Decal"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: extents
         type: vec3
       - id: texture
@@ -886,8 +896,9 @@ types:
       - id: script_name
         type: vstring
         doc: always "Push Region"
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: shape
         type: u4
         enum: push_region_shape
@@ -984,8 +995,9 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
   # Cutscene Paths
   cutscene_paths_section:
     seq:
@@ -1094,20 +1106,20 @@ types:
       - id: count
         type: u4
       - id: nav_points
-        type: rfl_nav_point
+        type: nav_point
         repeat: expr
         repeat-expr: count
       - id: nav_point_connections
         type: nav_point_connections
         repeat: expr
         repeat-expr: count
-  rfl_nav_point:
+  nav_point:
     seq:
       - id: uid
         type: u4
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
-        doc: typically 0
+        doc: 0 or 1
       - id: height
         type: f4
       - id: pos
@@ -1123,10 +1135,10 @@ types:
       - id: rot
         type: mat3
         if: directional != 0
-      - id: unknown2
+      - id: unknown1
         type: u1
         doc: typically 0
-      - id: unknown3
+      - id: unknown2
         type: u1
         doc: typically 0
       - id: crunch
@@ -1166,8 +1178,9 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: cooperation
         type: u4
         enum: entity_cooperation
@@ -1180,7 +1193,7 @@ types:
         type: vstring
       - id: waypoint_method
         type: vstring
-      - id: unknown2
+      - id: unknown1
         type: u1
       - id: boarded
         type: u1
@@ -1204,7 +1217,7 @@ types:
       - id: ignore_terrain_when_firing
         type: u1
         doc: 1 or 0
-      - id: unknown3
+      - id: unknown2
         type: u1
       - id: start_crouched
         type: u1
@@ -1235,7 +1248,7 @@ types:
       - id: ai_attack_style
         type: u1
         enum: entity_ai_attack_style
-      - id: unknown4
+      - id: unknown3
         size: 4
       - id: turret_uid
         type: u4
@@ -1323,9 +1336,9 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: reserved
+      - id: hidden_in_editor
         type: u1
-        doc: 0x00
+        doc: 0 or 1
       - id: count
         type: u4
       - id: respawn_time
@@ -1354,8 +1367,11 @@ types:
         type: mat3
       - id: script_name
         type: vstring
-      - id: unknown2
-        size: 5
+      - id: hidden_in_editor
+        type: u1
+        doc: 0 or 1
+      - id: unknown
+        type: u4
       - id: skin
         type: vstring
       - id: links
@@ -1376,19 +1392,20 @@ types:
       - id: script_name
         type: vstring
         doc: depends on type
-      - id: unknown
+      - id: hidden_in_editor
         type: u1
+        doc: 0 or 1
       - id: is_box
         type: u1
         doc: 1 or 0
-      - id: unknown2
+      - id: unknown1
         size: 3
       - id: resets_after
         type: f4
       - id: resets_count
         type: u2
         doc: 0xFFFF - infinity
-      - id: unknown3
+      - id: unknown2
         type: u2
       - id: is_use_key_required
         type: u1
@@ -1398,7 +1415,7 @@ types:
       - id: weapon_activates
         type: u1
         doc: 1 or 0
-      - id: unknown4
+      - id: unknown3
         type: u1
       - id: is_npc
         type: u1
@@ -1446,7 +1463,7 @@ types:
         type: f4
       - id: inside_time
         type: f4
-      - id: unknown5
+      - id: unknown4
         type: u4
         doc: 0xFFFFFFFF
       - id: links
@@ -1461,7 +1478,7 @@ types:
   # Level Info
   level_info_section:
     seq:
-      - id: unknown
+      - id: unknown1
         type: u4
         doc: 0x00000001
       - id: level_name
@@ -1495,7 +1512,7 @@ types:
         type: vec3
       - id: rot
         type: mat3
-      - id: unknown
+      - id: unknown1
         size: 10
         doc: 00 00 ...
       - id: textures_count
@@ -1613,7 +1630,8 @@ enums:
     0x10: emit_steam
   geo_region_flags:
     0x02: sphere
-    0x04: unk
+    0x04: unknown
+    0x08: hidden_in_editor
     0x20: use_shallow_geomods
     0x40: is_ice
   light_flags:
