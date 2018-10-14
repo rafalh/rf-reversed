@@ -142,150 +142,7 @@ types:
         repeat: expr
         repeat-expr: count
 
-  # Sections
-  level_properties_section:
-    seq:
-      - id: geomod_texture
-        type: vstring
-      - id: hardness
-        type: u4
-      - id: ambient_color
-        type: color
-      - id: unknown
-        type: u1
-      - id: fog_color
-        type: color
-      - id: fog_near_plane
-        type: f4
-      - id: fog_far_plane
-        type: f4
-  geo_regions_section:
-    seq:
-      - id: count
-        type: u4
-      - id: geo_regions
-        type: geo_region
-        repeat: expr
-        repeat-expr: count
-  geo_region:
-    seq:
-      - id: uid
-        type: u4
-      - id: flags
-        type: u2
-        enum: geo_region_flags
-      - id: hardness
-        type: u2
-        doc: in range 0-100
-      - id: shallow_geomod_depth
-        type: f4
-        if: flags.to_i & geo_region_flags::use_shallow_geomods.to_i != 0
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-        if: flags.to_i & geo_region_flags::sphere.to_i == 0
-      - id: width
-        type: f4
-        if: flags.to_i & geo_region_flags::sphere.to_i == 0
-      - id: height
-        type: f4
-        if: flags.to_i & geo_region_flags::sphere.to_i == 0
-      - id: depth
-        type: f4
-        if: flags.to_i & geo_region_flags::sphere.to_i == 0
-      - id: radius
-        type: f4
-        if: flags.to_i & geo_region_flags::sphere.to_i != 0
-  lights_section:
-    seq:
-      - id: count
-        type: u4
-      - id: lights
-        type: light
-        repeat: expr
-        repeat-expr: count
-  light:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-        doc: "Light"
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-      - id: script_name
-        type: vstring
-      - id: reserved
-        type: u1
-      - id: flags
-        type: u4
-        enum: light_flags
-      - id: color
-        type: color
-      - id: range
-        type: f4
-      - id: fov
-        type: f4
-      - id: fov_dropoff
-        type: f4
-      - id: intensity_at_max_range
-        type: f4
-      - id: unknown1
-        type: f4
-      - id: tube_light_width
-        type: f4
-      - id: light_on_intensity
-        type: f4
-      - id: unknown2
-        size: 20
-  events_section:
-    seq:
-      - id: count
-        type: u4
-      - id: events
-        type: event
-        repeat: expr
-        repeat-expr: count
-  event:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-      - id: pos
-        type: vec3
-      - id: script_name
-        type: vstring
-      - id: unknown
-        type: u1
-      - id: delay
-        type: f4
-      - id: bool1
-        type: u1
-      - id: bool2
-        type: u1
-      - id: int1
-        type: u4
-      - id: int2
-        type: u4
-      - id: float1
-        type: f4
-      - id: float2
-        type: f4
-      - id: str1
-        type: vstring
-      - id: str2
-        type: vstring
-      - id: links
-        type: uid_list
-      - id: rot
-        type: mat3
-        if: class_name.str == "Alarm" or class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player"
-      - id: color
-        type: color
+  # Geometry
   room:
     seq:
       - id: id
@@ -355,7 +212,7 @@ types:
       - id: ambient_color
         type: color
         if: ambient_light == 1
-  rfl_vertex:
+  vertex:
     seq:
       - id: index
         type: u4
@@ -372,7 +229,7 @@ types:
         type: f4
         if: _parent.lm_unknown2 != 0xFFFFFFFF
         doc: lightmap V
-  rfl_face:
+  face:
     seq:
       - id: unknown
         type: f4
@@ -383,7 +240,7 @@ types:
         type: u4
       - id: lm_unknown2
         type: u4
-        doc: if not 0xFFFFFFFF rfl_vertex has lightmap coordinates; it's not lightmap id
+        doc: if not 0xFFFFFFFF vertex has lightmap coordinates; it's not lightmap id
       - id: unknown3
         type: u4
         doc: face id? sometimes is repeated.
@@ -406,10 +263,10 @@ types:
       - id: vertices_count
         type: u4
       - id: vertices
-        type: rfl_vertex
+        type: vertex
         repeat: expr
         repeat-expr: vertices_count
-  rfl_face_scroll:
+  face_scroll:
     seq:
       - id: face_id
         type: u4
@@ -432,7 +289,7 @@ types:
       - id: scroll_count
         type: u4
       - id: scroll
-        type: rfl_face_scroll
+        type: face_scroll
         repeat: expr
         repeat-expr: scroll_count
       - id: rooms_count
@@ -446,7 +303,7 @@ types:
         type: u4
         doc: equal to rooms_count, only compiled geometry
       - id: unknown2
-        type: rfl_rooms_unk
+        type: rooms_unk
         repeat: expr
         repeat-expr: unknown_count
       - id: unknown_count2
@@ -464,19 +321,19 @@ types:
       - id: faces_count
         type: u4
       - id: faces
-        type: rfl_face
+        type: face
         repeat: expr
         repeat-expr: faces_count
       - id: unknown_count3
         type: u4
       - id: unknown4
-        type: rfl_rooms_unk2
+        type: rooms_unk2
         repeat: expr
         repeat-expr: unknown_count3
       - id: unknown5
         type: u4
         if: _root.header.version == 0xB4
-  rfl_rooms_unk:
+  rooms_unk:
     seq:
       - id: mesh_index
         type: u4
@@ -487,7 +344,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: links_count
-  rfl_rooms_unk2:
+  rooms_unk2:
     seq:
       - id: lightmap
         type: u4
@@ -496,89 +353,331 @@ types:
       - id: face
         type: u4
         doc: index in faces
-  player_start_section:
+  # Geo Regions
+  geo_regions_section:
     seq:
+      - id: count
+        type: u4
+      - id: geo_regions
+        type: geo_region
+        repeat: expr
+        repeat-expr: count
+  geo_region:
+    seq:
+      - id: uid
+        type: u4
+      - id: flags
+        type: u2
+        enum: geo_region_flags
+      - id: hardness
+        type: u2
+        doc: in range 0-100
+      - id: shallow_geomod_depth
+        type: f4
+        if: flags.to_i & geo_region_flags::use_shallow_geomods.to_i != 0
       - id: pos
         type: vec3
       - id: rot
         type: mat3
-  level_info_section:
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
+      - id: width
+        type: f4
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
+      - id: height
+        type: f4
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
+      - id: depth
+        type: f4
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
+      - id: radius
+        type: f4
+        if: flags.to_i & geo_region_flags::sphere.to_i != 0
+  # Lights
+  lights_section:
     seq:
-      - id: unknown
+      - id: count
         type: u4
-        doc: 0x00000001
-      - id: level_name
+      - id: lights
+        type: light
+        repeat: expr
+        repeat-expr: count
+  light:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
         type: vstring
-      - id: author
+        doc: "Light"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
         type: vstring
-      - id: date
+      - id: reserved
+        type: u1
+      - id: flags
+        type: u4
+        enum: light_flags
+      - id: color
+        type: color
+      - id: range
+        type: f4
+      - id: fov
+        type: f4
+      - id: fov_dropoff
+        type: f4
+      - id: intensity_at_max_range
+        type: f4
+      - id: unknown1
+        type: f4
+      - id: tube_light_width
+        type: f4
+      - id: light_on_intensity
+        type: f4
+      - id: unknown2
+        size: 20
+  # Cutscene Cameras
+  cutscene_cameras_section:
+    seq:
+      - id: count
+        type: u4
+      - id: cutscene_cameras
+        type: cutscene_camera
+        repeat: expr
+        repeat-expr: count
+  cutscene_camera:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: "Cutscene Camera"
+      - id: unknown
+        size: 48
+      - id: script_name
         type: vstring
       - id: unknown2
         type: u1
-        doc: 00
-      - id: multiplayer_level
+        doc: 0x00
+  # Ambient Sounds
+  ambient_sounds_section:
+    seq:
+      - id: count
+        type: u4
+      - id: ambient_sounds
+        type: ambient_sound
+        repeat: expr
+        repeat-expr: count
+  ambient_sound:
+    seq:
+      - id: uid
+        type: u4
+      - id: pos
+        type: vec3
+      - id: unknown
         type: u1
-        doc: 0 or 1
+      - id: sound_file_name
+        type: vstring
+      - id: min_dist
+        type: f4
+      - id: volume_scale
+        type: f4
+      - id: rolloff
+        type: f4
+      - id: start_delay_ms
+        type: u4
+  # Events
+  events_section:
+    seq:
+      - id: count
+        type: u4
+      - id: events
+        type: event
+        repeat: expr
+        repeat-expr: count
+  event:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+      - id: pos
+        type: vec3
+      - id: script_name
+        type: vstring
+      - id: unknown
+        type: u1
+      - id: delay
+        type: f4
+      - id: bool1
+        type: u1
+      - id: bool2
+        type: u1
+      - id: int1
+        type: u4
+      - id: int2
+        type: u4
+      - id: float1
+        type: f4
+      - id: float2
+        type: f4
+      - id: str1
+        type: vstring
+      - id: str2
+        type: vstring
+      - id: links
+        type: uid_list
+      - id: rot
+        type: mat3
+        if: class_name.str == "Alarm" or class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player"
+      - id: color
+        type: color
+  # Multiplayer Respawn Points
+  mp_respawns_section:
+    seq:
+      - id: count
+        type: u4
+      - id: mp_respawns
+        type: mp_respawn
+        repeat: expr
+        repeat-expr: count
+  mp_respawn:
+    seq:
+      - id: uid
+        type: u4
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+      - id: zero
+        type: u1
+        doc: 0x00
+      - id: team
+        type: u4
+      - id: red_team
+        type: u1
+      - id: blue_team
+        type: u1
+      - id: bot
+        type: u1
+  # Level Properties
+  level_properties_section:
+    seq:
+      - id: geomod_texture
+        type: vstring
+      - id: hardness
+        type: u4
+      - id: ambient_color
+        type: color
+      - id: unknown
+        type: u1
+      - id: fog_color
+        type: color
+      - id: fog_near_plane
+        type: f4
+      - id: fog_far_plane
+        type: f4
+  # Gas Regions
+  gas_regions_section:
+    seq:
+      - id: count
+        type: u4
+      - id: gas_regions
+        type: gas_region
+        repeat: expr
+        repeat-expr: count
+  gas_region:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: "Gas Region"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+      - id: unknown2
+        size: 17
+  # Climbing Regions
+  climbing_regions_section:
+    seq:
+      - id: count
+        type: u4
+      - id: climbing_regions
+        type: climbing_region
+        repeat: expr
+        repeat-expr: count
+  climbing_region:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: "Climbing Region"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+      - id: unknown2
+        size: 17
+  # Bolt Emitters
+  bolt_emitter_section:
+    seq:
+      - id: count
+        type: u4
+      - id: bolt_emitters
+        type: bolt_emitter
+        repeat: expr
+        repeat-expr: count
+  bolt_emitter:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Bolt Emitter"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Bolt Emitter"
+      - id: unknown2
+        size: 45
+      - id: image
+        type: vstring
       - id: unknown3
-        size: 220
-  tga_files_section:
+        size: 5
+  # Lightmaps
+  lightmaps_section:
     seq:
-      - id: tga_files_count
+      - id: lightmaps_count
         type: u4
-      - id: tga_files
-        type: vstring
+      - id: lightmaps
+        type: lightmap
         repeat: expr
-        repeat-expr: tga_files_count
-        doc: many files, not textures
-  vcm_files_section:
+        repeat-expr: lightmaps_count
+  lightmap:
     seq:
-      - id: vcm_files_count
+      - id: w
         type: u4
-      - id: vcm_files
-        type: vstring
-        repeat: expr
-        repeat-expr: vcm_files_count
-      - id: unknown
+        doc: size of lightmap
+      - id: h
         type: u4
-        repeat: expr
-        repeat-expr: vcm_files_count
-        doc: 0x00000001
-  mvf_files_section:
-    seq:
-      - id: mvf_files_count
-        type: u4
-      - id: mvf_files
-        type: vstring
-        repeat: expr
-        repeat-expr: mvf_files_count
-      - id: unknown
-        type: u4
-        repeat: expr
-        repeat-expr: mvf_files_count
-  v3d_files_section:
-    seq:
-      - id: v3d_files_count
-        type: u4
-      - id: v3d_files
-        type: vstring
-        repeat: expr
-        repeat-expr: v3d_files_count
-      - id: unknown
-        type: u4
-        repeat: expr
-        repeat-expr: v3d_files_count
-  vfx_files_section:
-    seq:
-      - id: vfx_files_count
-        type: u4
-      - id: vfx_files
-        type: vstring
-        repeat: expr
-        repeat-expr: vfx_files_count
-      - id: unknown
-        type: u4
-        repeat: expr
-        repeat-expr: vfx_files_count
+        doc: size of lightmap
+      - id: bitmap
+        size: w * h * 3
+        doc: bitmap (24 bpp)
+  # Cutscenes
   cutscenes_section:
     seq:
       - id: count
@@ -617,6 +716,7 @@ types:
         type: s4
       - id: path_name
         type: vstring
+  # Cutscene Path Nodes
   cutscene_path_nodes_section:
     seq:
       - id: count
@@ -639,6 +739,7 @@ types:
         type: vstring
       - id: unknown
         type: u1
+  # Cutscene Paths
   cutscene_paths_section:
     seq:
       - id: count
@@ -657,6 +758,70 @@ types:
         type: u4
         repeat: expr
         repeat-expr: path_nodes_count
+  # TGA Files
+  tga_files_section:
+    seq:
+      - id: tga_files_count
+        type: u4
+      - id: tga_files
+        type: vstring
+        repeat: expr
+        repeat-expr: tga_files_count
+        doc: many files, not textures
+  # VCM Files
+  vcm_files_section:
+    seq:
+      - id: vcm_files_count
+        type: u4
+      - id: vcm_files
+        type: vstring
+        repeat: expr
+        repeat-expr: vcm_files_count
+      - id: unknown
+        type: u4
+        repeat: expr
+        repeat-expr: vcm_files_count
+        doc: 0x00000001
+  # MVF Files
+  mvf_files_section:
+    seq:
+      - id: mvf_files_count
+        type: u4
+      - id: mvf_files
+        type: vstring
+        repeat: expr
+        repeat-expr: mvf_files_count
+      - id: unknown
+        type: u4
+        repeat: expr
+        repeat-expr: mvf_files_count
+  # V3D Files
+  v3d_files_section:
+    seq:
+      - id: v3d_files_count
+        type: u4
+      - id: v3d_files
+        type: vstring
+        repeat: expr
+        repeat-expr: v3d_files_count
+      - id: unknown
+        type: u4
+        repeat: expr
+        repeat-expr: v3d_files_count
+  # VFX Files
+  vfx_files_section:
+    seq:
+      - id: vfx_files_count
+        type: u4
+      - id: vfx_files
+        type: vstring
+        repeat: expr
+        repeat-expr: vfx_files_count
+      - id: unknown
+        type: u4
+        repeat: expr
+        repeat-expr: vfx_files_count
+  # Waypoint Lists
   waypoint_lists_section:
     seq:
       - id: count
@@ -676,6 +841,7 @@ types:
         repeat: expr
         repeat-expr: count
         doc: probably index in waypoints objects array
+  # Nav Points
   nav_points_section:
     seq:
       - id: count
@@ -731,176 +897,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: count
-  lightmaps_section:
-    seq:
-      - id: lightmaps_count
-        type: u4
-      - id: lightmaps
-        type: lightmap
-        repeat: expr
-        repeat-expr: lightmaps_count
-  lightmap:
-    seq:
-      - id: w
-        type: u4
-        doc: size of lightmap
-      - id: h
-        type: u4
-        doc: size of lightmap
-      - id: bitmap
-        size: w * h * 3
-        doc: bitmap (24 bpp)
-  cutscene_cameras_section:
-    seq:
-      - id: count
-        type: u4
-      - id: cutscene_cameras
-        type: cutscene_camera
-        repeat: expr
-        repeat-expr: count
-  cutscene_camera:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-        doc: "Cutscene Camera"
-      - id: unknown
-        size: 48
-      - id: script_name
-        type: vstring
-      - id: unknown2
-        type: u1
-        doc: 0x00
-  ambient_sounds_section:
-    seq:
-      - id: count
-        type: u4
-      - id: ambient_sounds
-        type: ambient_sound
-        repeat: expr
-        repeat-expr: count
-  ambient_sound:
-    seq:
-      - id: uid
-        type: u4
-      - id: pos
-        type: vec3
-      - id: unknown
-        type: u1
-      - id: sound_file_name
-        type: vstring
-      - id: min_dist
-        type: f4
-      - id: volume_scale
-        type: f4
-      - id: rolloff
-        type: f4
-      - id: start_delay_ms
-        type: u4
-  mp_respawns_section:
-    seq:
-      - id: count
-        type: u4
-      - id: mp_respawns
-        type: mp_respawn
-        repeat: expr
-        repeat-expr: count
-  mp_respawn:
-    seq:
-      - id: uid
-        type: u4
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-      - id: script_name
-        type: vstring
-      - id: zero
-        type: u1
-        doc: 0x00
-      - id: team
-        type: u4
-      - id: red_team
-        type: u1
-      - id: blue_team
-        type: u1
-      - id: bot
-        type: u1
-  gas_regions_section:
-    seq:
-      - id: count
-        type: u4
-      - id: gas_regions
-        type: gas_region
-        repeat: expr
-        repeat-expr: count
-  gas_region:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-        doc: "Gas Region"
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-      - id: script_name
-        type: vstring
-      - id: unknown2
-        size: 17
-  climbing_regions_section:
-    seq:
-      - id: count
-        type: u4
-      - id: climbing_regions
-        type: climbing_region
-        repeat: expr
-        repeat-expr: count
-  climbing_region:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-        doc: "Climbing Region"
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-      - id: script_name
-        type: vstring
-      - id: unknown2
-        size: 17
-  bolt_emitter_section:
-    seq:
-      - id: count
-        type: u4
-      - id: bolt_emitters
-        type: bolt_emitter
-        repeat: expr
-        repeat-expr: count
-  bolt_emitter:
-    seq:
-      - id: uid
-        type: u4
-      - id: class_name
-        type: vstring
-        doc: always "Bolt Emitter"
-      - id: pos
-        type: vec3
-      - id: rot
-        type: mat3
-      - id: script_name
-        type: vstring
-        doc: always "Bolt Emitter"
-      - id: unknown2
-        size: 45
-      - id: image
-        type: vstring
-      - id: unknown3
-        size: 5
+  # Entities
   entities_section:
     seq:
       - id: count
@@ -1057,6 +1054,7 @@ types:
         type: vstring
       - id: right_hand_holding
         type: vstring
+  # Items
   items_section:
     seq:
       - id: count
@@ -1087,6 +1085,7 @@ types:
         type: u4
       - id: team_id
         type: u4
+  # Clutters
   clutters_section:
     seq:
       - id: count
@@ -1114,6 +1113,7 @@ types:
         type: vstring
       - id: links
         type: uid_list
+  # Triggers
   triggers_section:
     seq:
       - id: count
@@ -1204,6 +1204,34 @@ types:
         doc: 0xFFFFFFFF
       - id: links
         type: uid_list
+  # Player Start
+  player_start_section:
+    seq:
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+  # Level Info
+  level_info_section:
+    seq:
+      - id: unknown
+        type: u4
+        doc: 0x00000001
+      - id: level_name
+        type: vstring
+      - id: author
+        type: vstring
+      - id: date
+        type: vstring
+      - id: unknown2
+        type: u1
+        doc: 00
+      - id: multiplayer_level
+        type: u1
+        doc: 0 or 1
+      - id: unknown3
+        size: 220
+  # Brushes
   brushes_section:
     seq:
       - id: brushes_count
@@ -1241,7 +1269,7 @@ types:
       - id: faces_count
         type: u4
       - id: faces
-        type: rfl_face
+        type: face
         repeat: expr
         repeat-expr: faces_count
       - id: unknown3
@@ -1255,6 +1283,7 @@ types:
       - id: unknown4
         type: u4
         doc: 3? 0?
+  # Groups
   groups_section:
     seq:
       - id: count
