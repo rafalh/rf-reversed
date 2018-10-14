@@ -68,7 +68,7 @@ types:
             'section_type::push_regions': push_regions_section
             'section_type::lightmaps': lightmaps_section
             'section_type::movers': movers_section
-            'section_type::moving_groups': moving_groups_section
+            'section_type::moving_groups': groups_section
             'section_type::cutscenes': cutscenes_section
             'section_type::cutscene_path_nodes': cutscene_path_nodes_section
             'section_type::cutscene_paths': cutscene_paths_section
@@ -87,7 +87,7 @@ types:
             'section_type::player_start': player_start_section
             'section_type::level_info': level_info_section
             'section_type::brushes': brushes_section
-            #'section_type::groups': groups_section
+            'section_type::groups': groups_section
             'section_type::editor_only_lights': lights_section
   vstring:
     doc: variable-length string
@@ -944,21 +944,36 @@ types:
         type: brush
         repeat: expr
         repeat-expr: count
-  # Moving groups
-  moving_groups_section:
+  # Moving groups / Groups
+  groups_section:
     seq:
       - id: count
         type: u4
       - id: moving_groups
-        type: moving_group
+        type: group
         repeat: expr
         repeat-expr: count
-  moving_group:
+  group:
     seq:
       - id: name
         type: vstring
-      - id: unknown
-        size: 2
+      - id: unknown1
+        type: u1
+      - id: is_moving
+        type: u1
+        doc: 0 or 1
+      - id: moving_data
+        type: moving_group_data
+        if: is_moving != 0
+      - id: unknown_count2
+        type: u4
+      - id: unknown2
+        size: unknown_count2 * 4
+        doc: seems to be ID, but with what purpose
+      - id: contents
+        type: uid_list
+  moving_group_data:
+    seq:
       - id: keyframes_count
         type: u4
       - id: keyframes
@@ -967,7 +982,7 @@ types:
         repeat-expr: keyframes_count
       - id: unkown_count1
         type: u4
-      - id: unkown2
+      - id: unkown1
         size: unkown_count1 * 52
         doc: clearly id, pos, rot; but why?
       - id: is_door
@@ -1009,13 +1024,6 @@ types:
         type: vstring
       - id: close_vol
         type: f4
-      - id: unkown_count2
-        type: u4
-      - id: unkown3
-        size: unkown_count2 * 4
-        doc: seems to be ID, but with what purpose
-      - id: contents
-        type: uid_list
   keyframe:
     seq:
       - id: uid
@@ -1628,35 +1636,9 @@ types:
         enum: brush_flags
       - id: life
         type: s4
-      - id: unknown
+      - id: state
         type: u4
-        doc: 3? 0?
-  # Groups
-  groups_section:
-    seq:
-      - id: count
-        type: u4
-      - id: groups
-        type: group
-        repeat: expr
-        repeat-expr: count
-  group:
-    seq:
-      - id: name
-        type: vstring
-      - id: unknown1
-        type: u1
-      - id: unknown2_moving
-        type: u1
-      - id: unknown3
-        type: u4
-      - id: count
-        type: u4
-      - id: uids
-        type: u4
-        repeat: expr
-        repeat-expr: count
-
+        enum: brush_state
 enums:
   section_type:
     0x00000000: end
@@ -1712,6 +1694,10 @@ enums:
     0x2:  air
     0x4:  detail
     0x10: emits_steam
+  brush_state:
+    0x0: normal
+    0x2: locked
+    0x3: selected
   geo_region_flags:
     0x02: sphere
     0x04: unknown
