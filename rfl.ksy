@@ -7,13 +7,13 @@ meta:
   file-extension: rfl
 seq:
   - id: header
-    type: rfl_header
+    type: file_header
   - id: sections
-    type: rfl_section
+    type: section
     repeat: until
-    repeat-until: _.type == rfl_section_type::end
+    repeat-until: _.type == section_type::end
 types:
-  rfl_header:
+  file_header:
     seq:
       - id: signature
         contents: [0x55, 0xDA, 0xBA, 0xD4]
@@ -25,24 +25,24 @@ types:
         doc: last map modification
       - id: player_start_offset
         type: u4
-        doc: file offset to rfl_player_start section header
+        doc: file offset to player_start_section section header
       - id: level_info_offset
         type: u4
-        doc: file offset to rfl_level_info section header
+        doc: file offset to level_info_section section header
       - id: sections_count
         type: u4
       - id: unknown
         type: u4
         doc: sections data size - 8
       - id: level_name
-        type: rfl_string
+        type: vstring
       - id: mod_name
-        type: rfl_string
-  rfl_section:
+        type: vstring
+  section:
     seq:
       - id: type
         type: u4
-        enum: rfl_section_type
+        enum: section_type
       - id: len
         type: u4
       - id: body
@@ -50,45 +50,45 @@ types:
         type:
           switch-on: type
           cases:
-            'rfl_section_type::static_geometry': rfl_rooms_sect
-            'rfl_section_type::geo_regions': rfl_geo_regions
-            'rfl_section_type::lights': rfl_lights
-            'rfl_section_type::cutscene_cameras': rfl_cutscene_cameras
-            'rfl_section_type::ambient_sounds': rfl_ambient_sounds
-            'rfl_section_type::events': rfl_events
-            'rfl_section_type::mp_respawns': rfl_mp_respawns
-            'rfl_section_type::level_properties': rfl_level_properties
-            # 'rfl_section_type::particle_emitters': 
-            # 'rfl_section_type::gas_regions': 
-            # 'rfl_section_type::room_effects': 
-            # 'rfl_section_type::bolt_emitters': 
-            # 'rfl_section_type::targets': 
-            # 'rfl_section_type::decals': 
-            # 'rfl_section_type::push_regions': 
-            'rfl_section_type::lightmaps': rfl_lightmaps
-            # 'rfl_section_type::movers': 
-            # 'rfl_section_type::moving_groups': 
-            'rfl_section_type::cutscenes': rfl_cutscenes
-            'rfl_section_type::cutscene_path_nodes': rfl_cutscene_path_nodes
-            'rfl_section_type::cutscene_paths': rfl_cutscene_paths
-            'rfl_section_type::tga_unknown': rfl_tga_files
-            'rfl_section_type::vcm_unknown': rfl_vcm_files
-            'rfl_section_type::mvf_unknown': rfl_mvf_files
-            'rfl_section_type::v3d_unknown': rfl_v3d_files
-            'rfl_section_type::vfx_unknown': rfl_vfx_files
-            # 'rfl_section_type::eax_effects': 
-            'rfl_section_type::waypoint_lists': rfl_waypoint_lists
-            'rfl_section_type::nav_points': rfl_nav_points
-            'rfl_section_type::entities': rfl_entities
-            'rfl_section_type::items': rfl_items
-            'rfl_section_type::clutters':  rfl_clutters
-            'rfl_section_type::triggers': rfl_triggers
-            'rfl_section_type::player_start': rfl_player_start
-            'rfl_section_type::level_info': rfl_level_info
-            'rfl_section_type::brushes': rfl_brushes_sect
-            #'rfl_section_type::groups': rfl_groups
-            'rfl_section_type::editor_only_lights': rfl_lights
-  rfl_string:
+            'section_type::static_geometry': rooms_section
+            'section_type::geo_regions': geo_regions_section
+            'section_type::lights': lights_section
+            'section_type::cutscene_cameras': cutscene_cameras_section
+            'section_type::ambient_sounds': ambient_sounds_section
+            'section_type::events': events_section
+            'section_type::mp_respawns': mp_respawns_section
+            'section_type::level_properties': level_properties_section
+            # 'section_type::particle_emitters': 
+            # 'section_type::gas_regions': 
+            # 'section_type::room_effects': 
+            # 'section_type::bolt_emitters': 
+            # 'section_type::targets': 
+            # 'section_type::decals': 
+            # 'section_type::push_regions': 
+            'section_type::lightmaps': lightmaps_section
+            # 'section_type::movers': 
+            # 'section_type::moving_groups': 
+            'section_type::cutscenes': cutscenes_section
+            'section_type::cutscene_path_nodes': cutscene_path_nodes_section
+            'section_type::cutscene_paths': cutscene_paths_section
+            'section_type::tga_unknown': tga_files_section
+            'section_type::vcm_unknown': vcm_files_section
+            'section_type::mvf_unknown': mvf_files_section
+            'section_type::v3d_unknown': v3d_files_section
+            'section_type::vfx_unknown': vfx_files_section
+            # 'section_type::eax_effects': 
+            'section_type::waypoint_lists': waypoint_lists_section
+            'section_type::nav_points': nav_points_section
+            'section_type::entities': entities_section
+            'section_type::items': items_section
+            'section_type::clutters':  clutters_section
+            'section_type::triggers': triggers_section
+            'section_type::player_start': player_start_section
+            'section_type::level_info': level_info_section
+            'section_type::brushes': brushes_section
+            #'section_type::groups': groups_section
+            'section_type::editor_only_lights': lights_section
+  vstring:
     doc: variable-length string
     seq:
       - id: len
@@ -97,7 +97,7 @@ types:
         type: str
         size: len
         encoding: ASCII
-  rfl_vec3:
+  vec3:
     doc: 3D vector
     seq:
       - id: x
@@ -106,23 +106,23 @@ types:
         type: f4
       - id: z
         type: f4
-  rfl_mat3:
+  mat3:
     doc: rotation matrix, rows are in a non-standard order - 2, 3, 1
     seq:
       - id: forward
-        type: rfl_vec3
+        type: vec3
       - id: right
-        type: rfl_vec3
+        type: vec3
       - id: up
-        type: rfl_vec3
-  rfl_aabb:
+        type: vec3
+  aabb:
     doc: axis aligned bounding box
     seq:
       - id: p1
-        type: rfl_vec3
+        type: vec3
       - id: p2
-        type: rfl_vec3
-  rfl_color:
+        type: vec3
+  color:
     seq:
       - id: r
         type: u1
@@ -132,7 +132,7 @@ types:
         type: u1
       - id: a
         type: u1
-  rfl_uid_list:
+  uid_list:
     seq:
       - id: count
         type: u4
@@ -142,88 +142,88 @@ types:
         repeat-expr: count
 
   # Sections
-  rfl_level_properties:
+  level_properties_section:
     seq:
       - id: geomod_texture
-        type: rfl_string
+        type: vstring
       - id: hardness
         type: u4
       - id: ambient_color
-        type: rfl_color
+        type: color
       - id: unknown
         type: u1
       - id: fog_color
-        type: rfl_color
+        type: color
       - id: fog_near_plane
         type: f4
       - id: fog_far_plane
         type: f4
-  rfl_geo_regions:
+  geo_regions_section:
     seq:
       - id: count
         type: u4
       - id: geo_regions
-        type: rfl_geo_region
+        type: geo_region
         repeat: expr
         repeat-expr: count
-  rfl_geo_region:
+  geo_region:
     seq:
       - id: uid
         type: u4
       - id: flags
         type: u2
-        enum: rfl_geo_region_flags
+        enum: geo_region_flags
       - id: hardness
         type: u2
         doc: in range 0-100
       - id: shallow_geomod_depth
         type: f4
-        if: flags.to_i & rfl_geo_region_flags::use_shallow_geomods.to_i != 0
+        if: flags.to_i & geo_region_flags::use_shallow_geomods.to_i != 0
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
-        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+        type: mat3
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
       - id: width
         type: f4
-        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
       - id: height
         type: f4
-        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
       - id: depth
         type: f4
-        if: flags.to_i & rfl_geo_region_flags::sphere.to_i == 0
+        if: flags.to_i & geo_region_flags::sphere.to_i == 0
       - id: radius
         type: f4
-        if: flags.to_i & rfl_geo_region_flags::sphere.to_i != 0
-  rfl_lights:
+        if: flags.to_i & geo_region_flags::sphere.to_i != 0
+  lights_section:
     seq:
       - id: count
         type: u4
       - id: lights
-        type: rfl_light
+        type: light
         repeat: expr
         repeat-expr: count
-  rfl_light:
+  light:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: "Light"
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: reserved
         type: u1
       - id: flags
         type: u4
-        enum: rfl_light_flags
+        enum: light_flags
       - id: color
-        type: rfl_color
+        type: color
       - id: range
         type: f4
       - id: fov
@@ -240,24 +240,24 @@ types:
         type: f4
       - id: unknown2
         size: 20
-  rfl_events:
+  events_section:
     seq:
       - id: count
         type: u4
       - id: events
-        type: rfl_event
+        type: event
         repeat: expr
         repeat-expr: count
-  rfl_event:
+  event:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown
         type: u1
       - id: delay
@@ -275,23 +275,23 @@ types:
       - id: float2
         type: f4
       - id: str1
-        type: rfl_string
+        type: vstring
       - id: str2
-        type: rfl_string
+        type: vstring
       - id: links
-        type: rfl_uid_list
+        type: uid_list
       - id: rot
-        type: rfl_mat3
+        type: mat3
         if: class_name.str == "Alarm" or class_name.str == "Teleport" or class_name.str == "Play_Vclip" or class_name.str == "Teleport_Player"
       - id: color
-        type: rfl_color
-  rfl_room:
+        type: color
+  room:
     seq:
       - id: id
         type: u4
         doc: uid of room effect element or big numbers (>0x70000000)
       - id: aabb
-        type: rfl_aabb
+        type: aabb
       - id: is_skyroom
         type: u1
         doc: 1 or 0
@@ -319,15 +319,15 @@ types:
         type: f4
         doc: -1 == infinite
       - id: eax_effect
-        type: rfl_string
+        type: vstring
       - id: liquid_depth
         type: f4
         if: liquid_room == 1
       - id: liquid_color
-        type: rfl_color
+        type: color
         if: liquid_room == 1
       - id: liquid_surface_texture
-        type: rfl_string
+        type: vstring
         if: liquid_room == 1
       - id: liquid_visibility
         type: f4
@@ -352,13 +352,13 @@ types:
         type: f4
         if: liquid_room == 1
       - id: ambient_color
-        type: rfl_color
+        type: color
         if: ambient_light == 1
   rfl_vertex:
     seq:
       - id: index
         type: u4
-        doc: index in rfl_rooms_sect::vertices
+        doc: index in rooms_section::vertices
       - id: tex_u
         type: f4
       - id: tex_v
@@ -394,7 +394,7 @@ types:
         doc: not 0 for portals
       - id: flags
         type: u1
-        enum: rfl_face_flags
+        enum: face_flags
       - id: lightmap_res
         type: u1
         doc: 1 - default, 8 - lowest, 9 - low, A - high, B - highest
@@ -418,14 +418,14 @@ types:
       - id: vv
         type: f4
         doc: V velocity
-  rfl_rooms_sect:
+  rooms_section:
     seq:
       - id: unknown
         size: "_root.header.version > 0xB4 ? 10 : 6"
       - id: textures_count
         type: u4
       - id: textures
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: textures_count
       - id: scroll_count
@@ -438,7 +438,7 @@ types:
         type: u4
         doc: only compiled geometry
       - id: rooms
-        type: rfl_room
+        type: room
         repeat: expr
         repeat-expr: rooms_count
       - id: unknown_count
@@ -457,7 +457,7 @@ types:
       - id: vertices_count
         type: u4
       - id: vertices
-        type: rfl_vec3
+        type: vec3
         repeat: expr
         repeat-expr: vertices_count
       - id: faces_count
@@ -495,24 +495,23 @@ types:
       - id: face
         type: u4
         doc: index in faces
-  
-  rfl_player_start:
+  player_start_section:
     seq:
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
-  rfl_level_info:
+        type: mat3
+  level_info_section:
     seq:
       - id: unknown
         type: u4
         doc: 0x00000001
       - id: level_name
-        type: rfl_string
+        type: vstring
       - id: author
-        type: rfl_string
+        type: vstring
       - id: date
-        type: rfl_string
+        type: vstring
       - id: unknown2
         type: u1
         doc: 00
@@ -521,21 +520,21 @@ types:
         doc: 0 or 1
       - id: unknown3
         size: 220
-  rfl_tga_files:
+  tga_files_section:
     seq:
       - id: tga_files_count
         type: u4
       - id: tga_files
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: tga_files_count
         doc: many files, not textures
-  rfl_vcm_files:
+  vcm_files_section:
     seq:
       - id: vcm_files_count
         type: u4
       - id: vcm_files
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: vcm_files_count
       - id: unknown
@@ -543,43 +542,43 @@ types:
         repeat: expr
         repeat-expr: vcm_files_count
         doc: 0x00000001
-  rfl_mvf_files:
+  mvf_files_section:
     seq:
       - id: mvf_files_count
         type: u4
       - id: mvf_files
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: mvf_files_count
       - id: unknown
         type: u4
         repeat: expr
         repeat-expr: mvf_files_count
-  rfl_v3d_files:
+  v3d_files_section:
     seq:
       - id: v3d_files_count
         type: u4
       - id: v3d_files
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: v3d_files_count
       - id: unknown
         type: u4
         repeat: expr
         repeat-expr: v3d_files_count
-  rfl_vfx_files:
+  vfx_files_section:
     seq:
       - id: vfx_files_count
         type: u4
       - id: vfx_files
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: vfx_files_count
       - id: unknown
         type: u4
         repeat: expr
         repeat-expr: vfx_files_count
-  rfl_cutscenes:
+  cutscenes_section:
     seq:
       - id: count
         type: u4
@@ -616,30 +615,30 @@ types:
       - id: trigger_uid
         type: s4
       - id: path_name
-        type: rfl_string
-  rfl_cutscene_path_nodes:
+        type: vstring
+  cutscene_path_nodes_section:
     seq:
       - id: count
         type: u4
       - id: cutscene_path_nodes
-        type: rfl_cutscene_path_node
+        type: cutscene_path_node
         repeat: expr
         repeat-expr: count
-  rfl_cutscene_path_node:
+  cutscene_path_node:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown
         type: u1
-  rfl_cutscene_paths:
+  cutscene_paths_section:
     seq:
       - id: count
         type: u4
@@ -650,25 +649,25 @@ types:
   rfl_cutscene_path:
     seq:
       - id: name
-        type: rfl_string
+        type: vstring
       - id: path_nodes_count
         type: u4
       - id: path_nodes
         type: u4
         repeat: expr
         repeat-expr: path_nodes_count
-  rfl_waypoint_lists:
+  waypoint_lists_section:
     seq:
       - id: count
         type: u4
       - id: waypoint_lists
-        type: rfl_waypoint_list
+        type: waypoint_list
         repeat: expr
         repeat-expr: count
-  rfl_waypoint_list:
+  waypoint_list:
     seq:
       - id: name
-        type: rfl_string
+        type: vstring
       - id: count
         type: u4
       - id: waypoints
@@ -676,7 +675,7 @@ types:
         repeat: expr
         repeat-expr: count
         doc: probably index in waypoints objects array
-  rfl_nav_points:
+  nav_points_section:
     seq:
       - id: count
         type: u4
@@ -698,17 +697,17 @@ types:
       - id: height
         type: f4
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: radius
         type: f4
       - id: type
         type: u4
-        enum: rfl_nav_point_type
+        enum: nav_point_type
       - id: directional
         type: u1
         doc: 0 or 1
       - id: rot
-        type: rfl_mat3
+        type: mat3
         if: directional != 0
       - id: unknown2
         type: u1
@@ -722,7 +721,7 @@ types:
       - id: pause_time
         type: f4
       - id: links
-        type: rfl_uid_list
+        type: uid_list
   rfl_nav_point_connections:
     seq:
       - id: count
@@ -731,23 +730,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: count
-  rfl_level_properies:
-    seq:
-      - id: geomod_texture
-        type: rfl_string
-      - id: hardness
-        type: u4
-      - id: ambient_color
-        type: rfl_color
-      - id: unknown
-        type: u1
-      - id: fog_color
-        type: rfl_color
-      - id: fog_near_plane
-        type: f4
-      - id: fog_far_plane
-        type: f4
-  rfl_lightmap:
+  lightmap:
     seq:
       - id: w
         type: u4
@@ -758,54 +741,54 @@ types:
       - id: bitmap
         size: w * h * 3
         doc: bitmap (24 bpp)
-  rfl_lightmaps:
+  lightmaps_section:
     seq:
       - id: lightmaps_count
         type: u4
       - id: lightmaps
-        type: rfl_lightmap
+        type: lightmap
         repeat: expr
         repeat-expr: lightmaps_count
-  rfl_cutscene_cameras:
+  cutscene_cameras_section:
     seq:
       - id: count
         type: u4
       - id: cutscene_cameras
-        type: rfl_cutscene_camera
+        type: cutscene_camera
         repeat: expr
         repeat-expr: count
-  rfl_cutscene_camera:
+  cutscene_camera:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: "Cutscene Camera"
       - id: unknown
         size: 48
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown2
         type: u1
         doc: 0x00
-  rfl_ambient_sounds:
+  ambient_sounds_section:
     seq:
       - id: count
         type: u4
       - id: ambient_sounds
-        type: rfl_ambient_sound
+        type: ambient_sound
         repeat: expr
         repeat-expr: count
-  rfl_ambient_sound:
+  ambient_sound:
     seq:
       - id: uid
         type: u4
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: unknown
         type: u1
       - id: sound_file_name
-        type: rfl_string
+        type: vstring
       - id: min_dist
         type: f4
       - id: volume_scale
@@ -814,24 +797,24 @@ types:
         type: f4
       - id: start_delay_ms
         type: u4
-  rfl_mp_respawns:
+  mp_respawns_section:
     seq:
       - id: count
         type: u4
       - id: respawns
-        type: rfl_mp_respawn
+        type: mp_respawn
         repeat: expr
         repeat-expr: count
-  rfl_mp_respawn:
+  mp_respawn:
     seq:
       - id: uid
         type: u4
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: zero
         type: u1
         doc: 0x00
@@ -843,90 +826,90 @@ types:
         type: u1
       - id: bot
         type: u1
-  rfl_gas_region:
+  gas_region:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: "Gas Region"
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown2
         size: 17
-  rlf_climbing_region:
+  climbing_region:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: "Climbing Region"
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown2
         size: 17
-  rlf_bolt_emiter:
+  bolt_emiter:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: "Bolt Emiter"
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown2
         size: 45
       - id: image
-        type: rfl_string
+        type: vstring
       - id: unknown3
         size: 5
-  rfl_entities:
+  entities_section:
     seq:
       - id: count
         type: u4
       - id: entities
-        type: rfl_entity
+        type: entity
         repeat: expr
         repeat-expr: count
-  rfl_entity:
+  entity:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: depends on type
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown
         type: u1
       - id: cooperation
         type: u4
-        enum: rfl_entity_cooperation
+        enum: entity_cooperation
       - id: friendliness
         type: u4
-        enum: rfl_entity_friendliness
+        enum: entity_friendliness
       - id: team_id
         type: u4
       - id: waypoint_list
-        type: rfl_string
+        type: vstring
       - id: waypoint_method
-        type: rfl_string
+        type: vstring
       - id: unknown2
         type: u1
       - id: boarded
@@ -963,25 +946,25 @@ types:
       - id: fov
         type: u4
       - id: default_primary_weapon
-        type: rfl_string
+        type: vstring
       - id: default_secondary_weapon
-        type: rfl_string
+        type: vstring
       - id: item_drop
-        type: rfl_string
+        type: vstring
       - id: state_anim
-        type: rfl_string
+        type: vstring
       - id: corpse_pose
-        type: rfl_string
+        type: vstring
       - id: skin
-        type: rfl_string
+        type: vstring
       - id: death_anim
-        type: rfl_string
+        type: vstring
       - id: ai_mode
         type: u1
-        enum: rfl_entity_ai_mode
+        enum: entity_ai_mode
       - id: ai_attack_style
         type: u1
-        enum: rfl_entity_ai_attack_style
+        enum: entity_ai_attack_style
       - id: unknown4
         size: 4
       - id: turret_uid
@@ -1045,30 +1028,30 @@ types:
         type: f4
         if: use_custom_attack_range == 1
       - id: left_hand_holding
-        type: rfl_string
+        type: vstring
       - id: right_hand_holding
-        type: rfl_string
-  rfl_items:
+        type: vstring
+  items_section:
     seq:
       - id: count
         type: u4
       - id: items
-        type: rfl_item
+        type: item
         repeat: expr
         repeat-expr: count
-  rfl_item:
+  item:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: depends on type
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: reserved
         type: u1
         doc: 0x00
@@ -1078,47 +1061,47 @@ types:
         type: u4
       - id: team_id
         type: u4
-  rfl_clutters:
+  clutters_section:
     seq:
       - id: count
         type: u4
       - id: clutters
-        type: rfl_clutter
+        type: clutter
         repeat: expr
         repeat-expr: count
-  rfl_clutter:
+  clutter:
     seq:
       - id: uid
         type: u4
       - id: class_name
-        type: rfl_string
+        type: vstring
         doc: depends on type
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: script_name
-        type: rfl_string
+        type: vstring
       - id: unknown2
         size: 5
       - id: skin
-        type: rfl_string
+        type: vstring
       - id: links
-        type: rfl_uid_list
-  rfl_triggers:
+        type: uid_list
+  triggers_section:
     seq:
       - id: count
         type: u4
       - id: trigger
-        type: rfl_trigger
+        type: trigger
         repeat: expr
         repeat-expr: count
-  rfl_trigger:
+  trigger:
     seq:
       - id: uid
         type: u4
       - id: script_name
-        type: rfl_string
+        type: vstring
         doc: depends on type
       - id: unknown
         type: u1
@@ -1138,7 +1121,7 @@ types:
         type: u1
         doc: 1 or 0
       - id: key_name
-        type: rfl_string
+        type: vstring
       - id: weapon_activates
         type: u1
         doc: 1 or 0
@@ -1154,12 +1137,12 @@ types:
         type: u1
         doc: 1 or 0
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: sphere_radius
         type: f4
         if: is_box == 0
       - id: rot
-        type: rfl_mat3
+        type: mat3
         if: is_box != 0
       - id: box_height
         type: f4
@@ -1194,30 +1177,30 @@ types:
         type: u4
         doc: 0xFFFFFFFF
       - id: links
-        type: rfl_uid_list
-  rfl_brushes_sect:
+        type: uid_list
+  brushes_section:
     seq:
       - id: brushes_count
         type: u4
       - id: brushes
-        type: rfl_brush
+        type: brush
         repeat: expr
         repeat-expr: brushes_count
-  rfl_brush:
+  brush:
     seq:
       - id: uid
         type: u4
       - id: pos
-        type: rfl_vec3
+        type: vec3
       - id: rot
-        type: rfl_mat3
+        type: mat3
       - id: unknown
         size: 10
         doc: 00 00 ...
       - id: textures_count
         type: u4
       - id: textures
-        type: rfl_string
+        type: vstring
         repeat: expr
         repeat-expr: textures_count
       - id: unknown2
@@ -1226,7 +1209,7 @@ types:
       - id: vertices_count
         type: u4
       - id: vertices
-        type: rfl_vec3
+        type: vec3
         repeat: expr
         repeat-expr: vertices_count
       - id: faces_count
@@ -1240,24 +1223,24 @@ types:
         doc: 0
       - id: flags
         type: u4
-        enum: rfl_brush_flags
+        enum: brush_flags
       - id: life
         type: u4
       - id: unknown4
         type: u4
         doc: 3? 0?
-  rfl_groups:
+  groups_section:
     seq:
       - id: count
         type: u4
       - id: groups
-        type: rfl_group
+        type: group
         repeat: expr
         repeat-expr: count
-  rfl_group:
+  group:
     seq:
       - id: name
-        type: rfl_string
+        type: vstring
       - id: unknown1
         type: u1
       - id: unknown2_moving
@@ -1272,7 +1255,7 @@ types:
         repeat-expr: count
 
 enums:
-  rfl_section_type:
+  section_type:
     0x00000000: end
     0x00000100: static_geometry
     0x00000200: geo_regions
@@ -1313,7 +1296,7 @@ enums:
     0x02000000: brushes
     0x03000000: groups
     0x04000000: editor_only_lights
-  rfl_face_flags:
+  face_flags:
     0x01: show_sky
     0x02: mirrored
     0x04: unknown
@@ -1321,17 +1304,17 @@ enums:
     0x20: full_bright
     0x40: unknown3
     0x80: unknown4
-  rfl_brush_flags:
+  brush_flags:
     0x1:  portal
     0x2:  air
     0x4:  detail
     0x10: emit_steam
-  rfl_geo_region_flags:
+  geo_region_flags:
     0x02: sphere
     0x04: unk
     0x20: use_shallow_geomods
     0x40: is_ice
-  rfl_light_flags:
+  light_flags:
     0x1:   dynamic
     0x4:   shadow_casting
     0x8:   is_enabled
@@ -1339,26 +1322,26 @@ enums:
     0x20:  circular_spotlight
     #0x30:  tube_light
     0x200: unknown
-  rfl_entity_ai_mode:
+  entity_ai_mode:
     0: catatonic
     1: waiting
     2: waypoints
     3: collecting
     4: motion_detection
-  rfl_entity_ai_attack_style:
+  entity_ai_attack_style:
     0: default
     1: evasive
     2: direct
     3: stand_ground
-  rfl_entity_cooperation:
+  entity_cooperation:
     0: uncooperative
     1: species_cooperative
     2: cooperative
-  rfl_entity_friendliness:
+  entity_friendliness:
     0: unfriendly
     1: neutral
     2: friendly
     3: outcast
-  rfl_nav_point_type:
+  nav_point_type:
     0: walking
     1: flying
