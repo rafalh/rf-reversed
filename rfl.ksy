@@ -60,7 +60,7 @@ types:
             'section_type::level_properties': level_properties_section
             'section_type::particle_emitters': particle_emitters_section
             'section_type::gas_regions': gas_regions_section
-            # 'section_type::room_effects': 
+            'section_type::room_effects': room_effects_section
             'section_type::climbing_regions': climbing_regions_section
             'section_type::bolt_emitters': bolt_emitter_section
             'section_type::targets': targets_section
@@ -77,7 +77,7 @@ types:
             'section_type::mvf_unknown': mvf_files_section
             'section_type::v3d_unknown': v3d_files_section
             'section_type::vfx_unknown': vfx_files_section
-            # 'section_type::eax_effects': 
+            'section_type::eax_effects': eax_effects_section
             'section_type::waypoint_lists': waypoint_lists_section
             'section_type::nav_points': nav_points_section
             'section_type::entities': entities_section
@@ -192,23 +192,36 @@ types:
         if: liquid_room == 1
       - id: liquid_type
         type: u4
+        enum: liquid_type
         if: liquid_room == 1
       - id: liquid_alpha
         type: u4
         if: liquid_room == 1
-      - id: liquid_unknown
-        size: 13
+      - id: liquid_contains_plankton
+        type: u1
+        doc: 0 or 1
+        if: liquid_room == 1
+      - id: liquid_texture_pixels_per_meter_u
+        type: u4
+        if: liquid_room == 1
+      - id: liquid_texture_pixels_per_meter_v
+        type: u4
+        if: liquid_room == 1
+      - id: liquid_unknown2
+        type: f4
         if: liquid_room == 1
       - id: liquid_waveform
+        type: s4
+        if: liquid_room == 1
+        doc: -1 - None, 0 - Calm, 1 - Choppy
+      - id: liquid_texture_scroll_rate_u
         type: f4
         if: liquid_room == 1
-        doc: 0xFFFFFFF for None
-      - id: liquid_surface_texture_scroll_u
+        doc: times/s
+      - id: liquid_texture_scroll_rate_v
         type: f4
         if: liquid_room == 1
-      - id: liquid_surface_texture_scroll_v
-        type: f4
-        if: liquid_room == 1
+        doc: times/s
       - id: ambient_color
         type: color
         if: ambient_light == 1
@@ -721,6 +734,80 @@ types:
         type: color
       - id: gas_density
         type: f4
+  # Room Effects
+  room_effects_section:
+    seq:
+      - id: count
+        type: u4
+      - id: room_effects
+        type: room_effect
+        repeat: expr
+        repeat-expr: count
+  room_effect:
+    seq:
+      - id: effect_type
+        type: u4
+        enum: room_effect_type
+      - id: ambient_light_color
+        type: color
+        if: effect_type == room_effect_type::ambient_light
+      - id: liquid_properties
+        type: room_effect_liquid_properties
+        if: effect_type == room_effect_type::liquid_room
+      - id: room_is_cold
+        type: u1
+        doc: 0 or 1
+      - id: room_is_outside
+        type: u1
+        doc: 0 or 1
+      - id: room_is_air_lock
+        type: u1
+        doc: 0 or 1
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "Room Effect"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "Room Effect"
+      - id: hidden_in_editor
+        type: u1
+        doc: 0 or 1
+  room_effect_liquid_properties:
+    seq:
+      - id: waveform
+        type: u4
+        enum: liquid_waveform_type
+      - id: depth
+        type: f4
+      - id: surface_texture
+        type: vstring
+      - id: liquid_color
+        type: color
+      - id: visibility
+        type: f4
+      - id: liquid_type
+        type: u4
+        enum: liquid_type
+      - id: contains_plankton
+        type: u1
+      - id: texture_pixels_per_meter_u
+        type: u4
+      - id: texture_pixels_per_meter_v
+        type: u4
+      - id: texture_angle
+        type: f4
+      - id: texture_scroll_rate_u
+        type: f4
+        doc: times/s
+      - id: texture_scroll_rate_v
+        type: f4
+        doc: times/s
   # Climbing Regions
   climbing_regions_section:
     seq:
@@ -1200,6 +1287,34 @@ types:
         type: u4
         repeat: expr
         repeat-expr: vfx_files_count
+  # EAX Effects
+  eax_effects_section:
+    seq:
+      - id: count
+        type: u4
+      - id: eax_effects
+        type: eax_effect
+        repeat: expr
+        repeat-expr: count
+  eax_effect:
+    seq:
+      - id: effect_type
+        type: vstring
+      - id: uid
+        type: u4
+      - id: class_name
+        type: vstring
+        doc: always "EAX Effect"
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
+      - id: script_name
+        type: vstring
+        doc: always "EAX Effect"
+      - id: hidden_in_editor
+        type: u1
+        doc: 0 or 1
   # Waypoint Lists
   waypoint_lists_section:
     seq:
@@ -1792,3 +1907,16 @@ enums:
     3: loop_once
     4: loop_infinite
     5: lift
+  room_effect_type:
+    1: sky_room
+    2: liquid_room
+    3: ambient_light
+    4: none
+  liquid_type:
+    1: water
+    2: lava
+    3: acid
+  liquid_waveform_type:
+    1: none
+    2: calm
+    3: choppy
