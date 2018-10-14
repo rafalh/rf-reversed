@@ -595,15 +595,35 @@ types:
         type: u4
       - id: class_name
         type: vstring
-        doc: "Gas Region"
+        doc: always "Gas Region"
       - id: pos
         type: vec3
       - id: rot
         type: mat3
       - id: script_name
         type: vstring
-      - id: unknown2
-        size: 17
+        doc: always "Gas Region"
+      - id: unknown
+        type: u1
+      - id: shape
+        type: u4
+        enum: gas_region_shape
+      - id: radius
+        type: f4
+        if: shape == gas_region_shape::sphere
+      - id: height
+        type: f4
+        if: shape == gas_region_shape::box
+      - id: width
+        type: f4
+        if: shape == gas_region_shape::box
+      - id: depth
+        type: f4
+        if: shape == gas_region_shape::box
+      - id: gas_color
+        type: color
+      - id: gas_density
+        type: f4
   # Climbing Regions
   climbing_regions_section:
     seq:
@@ -1400,3 +1420,6 @@ enums:
   nav_point_type:
     0: walking
     1: flying
+  gas_region_shape:
+    1: sphere
+    2: box
