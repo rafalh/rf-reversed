@@ -68,8 +68,9 @@ types:
             'rfl_section_type::lightmaps': rfl_lightmaps
             # 'rfl_section_type::movers': 
             # 'rfl_section_type::moving_groups': 
-            # 'rfl_section_type::cut_scene_path_nodes': 
-            # 'rfl_section_type::unknown': 
+            'rfl_section_type::cutscenes': rfl_cutscenes
+            'rfl_section_type::cutscene_path_nodes': rfl_cutscene_path_nodes
+            'rfl_section_type::cutscene_paths': rfl_cutscene_paths
             'rfl_section_type::tga_unknown': rfl_tga_files
             'rfl_section_type::vcm_unknown': rfl_vcm_files
             'rfl_section_type::mvf_unknown': rfl_mvf_files
@@ -573,6 +574,84 @@ types:
         type: u4
         repeat: expr
         repeat-expr: vfx_files_count
+  rfl_cutscenes:
+    seq:
+      - id: count
+        type: u4
+      - id: cutscenes
+        type: rfl_cutscene
+        repeat: expr
+        repeat-expr: count
+  rfl_cutscene:
+    seq:
+      - id: uid
+        type: u4
+      - id: hide_player
+        type: u1
+      - id: fov
+        type: f4
+      - id: shots_count
+        type: u4
+      - id: shots
+        type: rfl_cutscene_shot
+        repeat: expr
+        repeat-expr: shots_count
+  rfl_cutscene_shot:
+    seq:
+      - id: camera_uid
+        type: s4
+      - id: pre_wait
+        type: f4
+      - id: path_time
+        type: f4
+      - id: post_wait
+        type: f4
+      - id: look_at_uid
+        type: s4
+      - id: trigger_uid
+        type: s4
+      - id: path_name
+        type: rfl_string
+  rfl_cutscene_path_nodes:
+    seq:
+      - id: count
+        type: u4
+      - id: cutscene_path_nodes
+        type: rfl_cutscene_path_node
+        repeat: expr
+        repeat-expr: count
+  rfl_cutscene_path_node:
+    seq:
+      - id: uid
+        type: u4
+      - id: class_name
+        type: rfl_string
+      - id: pos
+        type: rfl_vec3
+      - id: rot
+        type: rfl_mat3
+      - id: script_name
+        type: rfl_string
+      - id: unknown
+        type: u1
+  rfl_cutscene_paths:
+    seq:
+      - id: count
+        type: u4
+      - id: cutscene_paths
+        type: rfl_cutscene_path
+        repeat: expr
+        repeat-expr: count
+  rfl_cutscene_path:
+    seq:
+      - id: name
+        type: rfl_string
+      - id: path_nodes_count
+        type: u4
+      - id: path_nodes
+        type: u4
+        repeat: expr
+        repeat-expr: path_nodes_count
   rfl_waypoint_lists:
     seq:
       - id: count
@@ -1185,8 +1264,9 @@ enums:
     0x00001200: lightmaps
     0x00002000: movers
     0x00003000: moving_groups
-    0x00005000: cut_scene_path_nodes
-    0x00006000: unknown
+    0x00004000: cutscenes
+    0x00005000: cutscene_path_nodes
+    0x00006000: cutscene_paths
     0x00007000: tga_unknown
     0x00007001: vcm_unknown
     0x00007002: mvf_unknown
