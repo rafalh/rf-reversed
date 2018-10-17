@@ -1270,7 +1270,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: vcm_files_count
-        doc: 0x00000001
+        doc: typically 1
   # MVF Files
   mvf_files_section:
     seq:
@@ -1284,6 +1284,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: mvf_files_count
+        doc: typically 1 or 2
   # V3D Files
   v3d_files_section:
     seq:
@@ -1297,6 +1298,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: v3d_files_count
+        doc: typically 1 or 2
   # VFX Files
   vfx_files_section:
     seq:
@@ -1310,6 +1312,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: vfx_files_count
+        doc: typically 1
   # EAX Effects
   eax_effects_section:
     seq:
@@ -1453,6 +1456,7 @@ types:
         type: vstring
       - id: unknown1
         type: u1
+        doc: typically 0
       - id: boarded
         type: u1
         doc: 1 or 0
@@ -1477,6 +1481,7 @@ types:
         doc: 1 or 0
       - id: unknown2
         type: u1
+        doc: typically 0
       - id: start_crouched
         type: u1
         doc: 1 or 0
@@ -1508,7 +1513,8 @@ types:
         type: u1
         enum: entity_ai_attack_style
       - id: unknown3
-        size: 4
+        type: u4
+        doc: typically 0
       - id: turret_uid
         type: s4
       - id: alert_camera_uid
@@ -1671,8 +1677,9 @@ types:
       - id: weapon_activates
         type: u1
         doc: 1 or 0
-      - id: unknown1
+      - id: activated_by
         type: u1
+        enum: trigger_activated_by
       - id: is_npc
         type: u1
         doc: 1 or 0
@@ -1705,13 +1712,13 @@ types:
         doc: 1 or 0
       - id: airlock_room
         type: s4
-        doc: UID
+        doc: UID, -1 if empty
       - id: attached_to
         type: s4
-        doc: UID
+        doc: UID, -1 if empty
       - id: use_clutter
         type: s4
-        doc: UID
+        doc: UID, -1 if empty
       - id: disabled
         type: u1
         doc: 1 or 0
@@ -1719,9 +1726,9 @@ types:
         type: f4
       - id: inside_time
         type: f4
-      - id: unknown2
+      - id: team
         type: s4
-        doc: typically -1
+        enum: trigger_team
       - id: links
         type: uid_list
   # Player Start
@@ -1924,6 +1931,17 @@ enums:
   trigger_shape:
     0: sphere
     1: box
+  trigger_activated_by:
+    0: players_only
+    1: all_objects
+    2: linked_objects
+    3: ai_only
+    4: player_vehicle_only
+    5: geomods
+  trigger_team:
+    -1: none
+    0:  team_1
+    1:  team_2
   movement_type:
     0: one_way
     1: ping_pong_once
