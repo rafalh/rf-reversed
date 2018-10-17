@@ -34,9 +34,9 @@ types:
         doc: file offset to level_info_section section header
       - id: sections_count
         type: u4
-      - id: unknown
+      - id: sections_total_size
         type: u4
-        doc: sections data size - 8
+        doc: number of bytes used by all sections except trailing one (end)
       - id: level_name
         type: vstring
       - id: mod_name
@@ -177,6 +177,7 @@ types:
         doc: 1 or 0
       - id: unknown
         type: u1
+        doc: typically 0
       - id: life
         type: f4
         doc: -1.0f == infinite
@@ -212,7 +213,7 @@ types:
       - id: liquid_texture_pixels_per_meter_v
         type: u4
         if: liquid_room == 1
-      - id: liquid_unknown2
+      - id: liquid_texture_angle_radians
         type: f4
         if: liquid_room == 1
       - id: liquid_waveform
@@ -298,6 +299,7 @@ types:
     seq:
       - id: unknown
         size: "_root.header.version >= 0xC8 ? 10 : 6"
+        doc: typically zeros
       - id: textures_count
         type: u4
       - id: textures
@@ -312,7 +314,7 @@ types:
         repeat: expr
         repeat-expr: scroll_count
         if: _root.header.version > 0xB4
-      - id: unknown_up_to_b4
+      - id: unknown_up_to_version_b4
         type: u4
         if: _root.header.version <= 0xB4
       - id: rooms_count
