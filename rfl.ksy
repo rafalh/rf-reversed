@@ -464,13 +464,15 @@ types:
       - id: intensity_at_max_range
         type: f4
       - id: unknown1
-        type: f4
+        type: u4
+        doc: typicaly 0 or 2
       - id: tube_light_width
         type: f4
-      - id: light_on_intensity
+      - id: intensity
         type: f4
       - id: unknown2
         size: 20
+        doc: typically [1.0f, 0.0f, 0.0f, 1.0f, 0.0f]
   # Cutscene Cameras
   cutscene_cameras_section:
     seq:
@@ -613,6 +615,7 @@ types:
         type: color
       - id: unknown
         type: u1
+        doc: typically 0
       - id: fog_color
         type: color
       - id: fog_near_plane
@@ -700,6 +703,7 @@ types:
         type: b4
       - id: unknown
         type: u1
+        doc: typically 1
       - id: time_on
         type: f4
       - id: time_on_randomize
@@ -821,7 +825,7 @@ types:
         type: u4
       - id: texture_pixels_per_meter_v
         type: u4
-      - id: texture_angle
+      - id: texture_angle_degrees
         type: f4
       - id: texture_scroll_rate_u
         type: f4
@@ -1057,7 +1061,7 @@ types:
     seq:
       - id: count
         type: u4
-      - id: moving_groups
+      - id: groups
         type: group
         repeat: expr
         repeat-expr: count
@@ -1065,20 +1069,18 @@ types:
     seq:
       - id: name
         type: vstring
-      - id: unknown1
+      - id: unknown
         type: u1
+        doc: typically 0
       - id: is_moving
         type: u1
         doc: 0 or 1
       - id: moving_data
         type: moving_group_data
         if: is_moving != 0
-      - id: unknown_count2
-        type: u4
-      - id: unknown2
-        size: unknown_count2 * 4
-        doc: seems to be ID, but with what purpose
-      - id: contents
+      - id: objects
+        type: uid_list
+      - id: brushes
         type: uid_list
   moving_group_data:
     seq:
