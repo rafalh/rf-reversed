@@ -76,11 +76,11 @@ types:
             'section_type::cutscenes': cutscenes_section
             'section_type::cutscene_path_nodes': cutscene_path_nodes_section
             'section_type::cutscene_paths': cutscene_paths_section
-            'section_type::tga_unknown': tga_files_section
-            'section_type::vcm_unknown': vcm_files_section
-            'section_type::mvf_unknown': mvf_files_section
-            'section_type::v3d_unknown': v3d_files_section
-            'section_type::vfx_unknown': vfx_files_section
+            'section_type::tga_files': tga_files_section
+            'section_type::vcm_files': vcm_files_section
+            'section_type::mvf_files': mvf_files_section
+            'section_type::v3d_files': v3d_files_section
+            'section_type::vfx_files': vfx_files_section
             'section_type::eax_effects': eax_effects_section
             'section_type::waypoint_lists': waypoint_lists_section
             'section_type::nav_points': nav_points_section
@@ -1799,11 +1799,11 @@ enums:
     0x00004000: cutscenes
     0x00005000: cutscene_path_nodes
     0x00006000: cutscene_paths
-    0x00007000: tga_unknown
-    0x00007001: vcm_unknown
-    0x00007002: mvf_unknown
-    0x00007003: v3d_unknown
-    0x00007004: vfx_unknown
+    0x00007000: tga_files
+    0x00007001: vcm_files
+    0x00007002: mvf_files
+    0x00007003: v3d_files
+    0x00007004: vfx_files
     0x00008000: eax_effects
     0x00010000: waypoint_lists
     0x00020000: nav_points
