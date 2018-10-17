@@ -1750,14 +1750,31 @@ types:
         type: vstring
       - id: date
         type: vstring
-      - id: unknown2
+      - id: has_movers
         type: u1
-        doc: typically 0
+        doc: 0 or 1
       - id: multiplayer_level
         type: u1
         doc: 0 or 1
-      - id: unknown3
-        size: 220
+      - id: editor_view_configs
+        type: editor_view_config
+        repeat: expr
+        repeat-expr: 4
+  editor_view_config:
+    seq:
+      - id: view_type
+        type: u4
+        enum: editor_view_type
+      - id: pos_3d
+        type: vec3
+        if: view_type == editor_view_type::free_look
+      - id: pos_2d
+        type: f4
+        repeat: expr
+        repeat-expr: 4
+        if: view_type != editor_view_type::free_look
+      - id: rot
+        type: mat3
   # Brushes
   brushes_section:
     seq:
@@ -1962,3 +1979,11 @@ enums:
     1: none
     2: calm
     3: choppy
+  editor_view_type:
+    0: free_look
+    1: top
+    2: bottom
+    3: front
+    4: back
+    5: left
+    6: right
