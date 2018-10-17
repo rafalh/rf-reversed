@@ -1,3 +1,6 @@
+# RFL format reverse engineered by:
+# * Rafal Harabien (Open Faction project)
+# * wardd64 (Unity Faction project)
 meta:
   id: rfl
   title: Red Faction Level
