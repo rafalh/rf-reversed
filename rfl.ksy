@@ -242,41 +242,47 @@ types:
         type: f4
       - id: lm_u
         type: f4
-        if: _parent.as<face>.lm_unknown2 != -1
+        if: _parent.as<face>.lightmap_info_index != -1
         doc: lightmap U
       - id: lm_v
         type: f4
-        if: _parent.as<face>.lm_unknown2 != -1
+        if: _parent.as<face>.lightmap_info_index != -1
         doc: lightmap V
   face:
     seq:
-      - id: unknown
+      - id: plane
         type: f4
         repeat: expr
         repeat-expr: 4
-        doc: plane (normal vector and distance from 0)?
+        doc: normal vector and distance from 0
       - id: texture
         type: u4
-      - id: lm_unknown2
+        doc: index in geometry::textures array
+      - id: lightmap_info_index
         type: s4
-        doc: if not -1 vertex has lightmap coordinates; it's not lightmap id
-      - id: unknown3
+        doc: index in geometry::face_lightmap_infos array or -1 if no lightmap is used
+      - id: unknown1
         type: u4
         doc: face id? sometimes is repeated.
-      - id: unknown4
+      - id: unknown2
         size: 8
-        doc: FF FF FF FF FF FF FF FF
-      - id: unknown5
+        doc: typically FF FF FF FF FF FF FF FF
+      - id: unknown3
         type: u4
         doc: not 0 for portals
       - id: flags
         type: u1
         enum: face_flags
+        doc: flags can differ depending on section (e.g. is_detail flag is used in static_geometry but not in brushes)
       - id: lightmap_res
         type: u1
         doc: 1 - default, 8 - lowest, 9 - low, A - high, B - highest
-      - id: unknown6
-        size: 6
+      - id: unknown4
+        type: u2
+        doc: typically 0
+      - id: smoothing_groups
+        type: u4
+        doc: each bit controls one smoothing group
       - id: room_index
         type: s4
       - id: vertices_count
@@ -297,7 +303,7 @@ types:
         doc: V velocity
   geometry:
     seq:
-      - id: unknown
+      - id: unknown1
         size: "_root.header.version >= 0xC8 ? 10 : 6"
         doc: typically zeros
       - id: textures_count
@@ -324,19 +330,19 @@ types:
         type: room
         repeat: expr
         repeat-expr: rooms_count
-      - id: unknown_count
+      - id: unknown2_count
         type: u4
         doc: equal to rooms_count, only compiled geometry
       - id: unknown2
         type: rooms_unk
         repeat: expr
-        repeat-expr: unknown_count
-      - id: unknown_count2
+        repeat-expr: unknown2_count
+      - id: unknown3_count
         type: u4
       - id: unknown3
         type: u1
         repeat: expr
-        repeat-expr: unknown_count2 * 32
+        repeat-expr: unknown3_count * 32
       - id: vertices_count
         type: u4
       - id: vertices
@@ -349,12 +355,12 @@ types:
         type: face
         repeat: expr
         repeat-expr: faces_count
-      - id: unknown_count3
+      - id: num_face_lightmap_infos
         type: u4
-      - id: unknown4
-        type: rooms_unk2
+      - id: face_lightmap_infos
+        type: face_lightmap_info
         repeat: expr
-        repeat-expr: unknown_count3
+        repeat-expr: num_face_lightmap_infos
       - id: unknown5
         type: u4
         if: _root.header.version == 0xB4
@@ -377,10 +383,11 @@ types:
         type: u4
         repeat: expr
         repeat-expr: links_count
-  rooms_unk2:
+  face_lightmap_info:
     seq:
       - id: lightmap
         type: u4
+        doc: index in lightmaps_section::lightmaps array
       - id: unknown
         size: 88
       - id: face
@@ -1741,7 +1748,7 @@ types:
   # Level Info
   level_info_section:
     seq:
-      - id: unknown1
+      - id: unknown
         type: u4
         doc: typically 1
       - id: level_name
@@ -1848,10 +1855,10 @@ enums:
     0x01: show_sky
     0x02: mirrored
     0x04: unknown
-    0x08: unknown2
+    0x08: is_detail
     0x20: full_bright
-    0x40: unknown3
-    0x80: unknown4
+    0x40: unknown2
+    0x80: unknown3
   brush_flags:
     0x1:  portal
     0x2:  air
