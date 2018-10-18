@@ -399,8 +399,43 @@ types:
       - id: lightmap
         type: u4
         doc: index in lightmaps_section::lightmaps array
-      - id: unknown
-        size: 88
+      - id: x
+        type: u1
+        doc: X coordinate of lightmap bitmap fragment used by this face
+      - id: y
+        type: u1
+        doc: Y coordinate of lightmap bitmap fragment used by this face
+      - id: w
+        type: u1
+        doc: width of lightmap bitmap fragment used by this face
+      - id: h
+        type: u1
+        doc: height of lightmap bitmap fragment used by this face
+      - id: unknown_floats
+        type: f4
+        repeat: expr
+        repeat-expr: 2
+        doc: typically positive small numbers
+      - id: aabb
+        type: aabb
+      - id: plane
+        type: f4
+        repeat: expr
+        repeat-expr: 4
+        doc: normal vector and distance from 0
+      - id: unknown_zeros
+        size: 8
+        doc: typically zeros
+      - id: unknown_indices
+        type: u4
+        repeat: expr
+        repeat-expr: 3
+        doc: typically permutation of [0, 1, 2], some indices?
+      - id: unknown_floats3
+        type: f4
+        repeat: expr
+        repeat-expr: 4
+        doc: related to position and size in 3d space
       - id: room_index
         type: u4
         doc: index in rooms
