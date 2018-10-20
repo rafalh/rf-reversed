@@ -32,7 +32,7 @@ types:
       - id: level_info_offset
         type: u4
         doc: file offset to level_info_section section header
-      - id: sections_count
+      - id: num_sections
         type: u4
       - id: sections_total_size
         type: u4
@@ -60,7 +60,7 @@ types:
             'section_type::cutscene_cameras': cutscene_cameras_section
             'section_type::ambient_sounds': ambient_sounds_section
             'section_type::events': events_section
-            'section_type::mp_respawns': mp_respawns_section
+            'section_type::mp_respawn_points': mp_respawn_points_section
             'section_type::level_properties': level_properties_section
             'section_type::particle_emitters': particle_emitters_section
             'section_type::gas_regions': gas_regions_section
@@ -111,6 +111,13 @@ types:
         type: f4
       - id: z
         type: f4
+  uv:
+    doc: UV coordinates
+    seq:
+      - id: u
+        type: f4
+      - id: v
+        type: f4
   mat3:
     doc: rotation matrix, rows are in a non-standard order - 2, 3, 1
     seq:
@@ -139,12 +146,12 @@ types:
         type: u1
   uid_list:
     seq:
-      - id: count
+      - id: num_uids
         type: u4
       - id: uids
         type: u4
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_uids
 
   # Geometry
   room:
@@ -220,12 +227,8 @@ types:
         type: s4
         if: liquid_room == 1
         doc: -1 - None, 0 - Calm, 1 - Choppy
-      - id: liquid_texture_scroll_rate_u
-        type: f4
-        if: liquid_room == 1
-        doc: times/s
-      - id: liquid_texture_scroll_rate_v
-        type: f4
+      - id: liquid_texture_scroll_rate
+        type: uv
         if: liquid_room == 1
         doc: times/s
       - id: ambient_color
@@ -236,18 +239,13 @@ types:
       - id: index
         type: u4
         doc: index in geometry::vertices
-      - id: tex_u
-        type: f4
-      - id: tex_v
-        type: f4
-      - id: lm_u
-        type: f4
-        if: _parent.as<face>.lightmap_info_index != -1
-        doc: lightmap U
-      - id: lm_v
-        type: f4
-        if: _parent.as<face>.lightmap_info_index != -1
-        doc: lightmap V
+      - id: texture_coords
+        type: uv
+        doc: texture UV coordinates
+      - id: lightmap_coords
+        type: uv
+        if: _parent.as<face>.lighting_data_index != -1
+        doc: lightmap UV coordinates
   face:
     seq:
       - id: plane
@@ -258,12 +256,12 @@ types:
       - id: texture
         type: s4
         doc: index in geometry::textures array, -1 if portal
-      - id: lightmap_info_index
+      - id: lighting_data_index
         type: s4
-        doc: index in geometry::face_lightmap_infos array or -1 if no lightmap is used
+        doc: index in geometry::face_lighting_data array or -1 if no lightmap is used
       - id: face_id
         type: u4
-        doc: before building geometry ID can be ambiguous
+        doc: before building geometry an ID can be ambiguous
       - id: unknown1
         size: 8
         doc: typically FF FF FF FF FF FF FF FF
@@ -285,13 +283,13 @@ types:
         doc: each bit controls one smoothing group
       - id: room_index
         type: s4
-      - id: vertices_count
+      - id: num_vertices
         type: u4
       - id: vertices
         type: vertex
         repeat: expr
-        repeat-expr: vertices_count
-  face_scroll:
+        repeat-expr: num_vertices
+  face_scroll_data:
     seq:
       - id: face_id
         type: u4
@@ -306,85 +304,85 @@ types:
       - id: unknown1
         size: "_root.header.version >= 0xC8 ? 10 : 6"
         doc: typically zeros
-      - id: textures_count
+      - id: num_textures
         type: u4
       - id: textures
         type: vstring
         repeat: expr
-        repeat-expr: textures_count
-      - id: scroll_count
+        repeat-expr: num_textures
+      - id: num_face_scroll_data
         type: u4
         if: _root.header.version > 0xB4
-      - id: scroll
-        type: face_scroll
+      - id: face_scroll_data
+        type: face_scroll_data
         repeat: expr
-        repeat-expr: scroll_count
+        repeat-expr: num_face_scroll_data
         if: _root.header.version > 0xB4
       - id: unknown_up_to_version_b4
         type: u4
         if: _root.header.version <= 0xB4
-      - id: rooms_count
+      - id: num_rooms
         type: u4
         doc: only compiled geometry
       - id: rooms
         type: room
         repeat: expr
-        repeat-expr: rooms_count
-      - id: subroom_list_count
+        repeat-expr: num_rooms
+      - id: num_subroom_lists
         type: u4
-        doc: equal to rooms_count, only compiled geometry
+        doc: typically equal to num_rooms
       - id: subroom_lists
         type: subroom_list
         repeat: expr
-        repeat-expr: subroom_list_count
-      - id: portal_count
+        repeat-expr: num_subroom_lists
+      - id: num_portals
         type: u4
       - id: portals
-        type: portal_info
+        type: portal
         repeat: expr
-        repeat-expr: portal_count
-      - id: vertices_count
+        repeat-expr: num_portals
+      - id: num_vertices
         type: u4
       - id: vertices
         type: vec3
         repeat: expr
-        repeat-expr: vertices_count
-      - id: faces_count
+        repeat-expr: num_vertices
+      - id: num_faces
         type: u4
       - id: faces
         type: face
         repeat: expr
-        repeat-expr: faces_count
-      - id: num_face_lightmap_infos
+        repeat-expr: num_faces
+      - id: num_face_lighting_data
         type: u4
-      - id: face_lightmap_infos
-        type: face_lightmap_info
+      - id: face_lighting_data
+        type: face_lighting_data
         repeat: expr
-        repeat-expr: num_face_lightmap_infos
+        repeat-expr: num_face_lighting_data
       - id: unknown5
         type: u4
         if: _root.header.version == 0xB4
-      - id: legacy_scroll_count
+      - id: legacy_num_face_scroll_data
         type: u4
         if: _root.header.version <= 0xB4
-      - id: legacy_scroll
-        type: face_scroll
+      - id: legacy_face_scroll_data
+        type: face_scroll_data
         repeat: expr
-        repeat-expr: scroll_count
+        repeat-expr: legacy_num_face_scroll_data
         if: _root.header.version <= 0xB4
   subroom_list:
     seq:
       - id: room_index
         type: u4
         doc: parent room
-      - id: subroom_count
+      - id: num_subrooms
         type: u4
       - id: subroom_indices
         type: u4
         repeat: expr
-        repeat-expr: subroom_count
+        repeat-expr: num_subrooms
         doc: contained rooms
-  portal_info:
+  portal:
     seq:
       - id: room_index1
         type: u4
@@ -394,9 +392,9 @@ types:
         type: vec3
       - id: point2
         type: vec3
-  face_lightmap_info:
+  face_lighting_data:
     seq:
-      - id: lightmap
+      - id: lightmap_index
         type: u4
         doc: index in lightmaps_section::lightmaps array
       - id: x
@@ -442,12 +440,12 @@ types:
   # Geo Regions
   geo_regions_section:
     seq:
-      - id: count
+      - id: num_geo_regions
         type: u4
       - id: geo_regions
         type: geo_region
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_geo_regions
   geo_region:
     seq:
       - id: uid
@@ -481,12 +479,12 @@ types:
   # Lights
   lights_section:
     seq:
-      - id: count
+      - id: num_lights
         type: u4
       - id: lights
         type: light
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_lights
   light:
     seq:
       - id: uid
@@ -529,37 +527,38 @@ types:
   # Cutscene Cameras
   cutscene_cameras_section:
     seq:
-      - id: count
+      - id: num_cutscene_cameras
         type: u4
       - id: cutscene_cameras
         type: cutscene_camera
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_cutscene_cameras
   cutscene_camera:
     seq:
       - id: uid
         type: u4
       - id: class_name
         type: vstring
-        doc: "Cutscene Camera"
+        doc: always "Cutscene Camera"
       - id: pos
         type: vec3
       - id: rot
         type: mat3
       - id: script_name
         type: vstring
+        doc: always "Cutscene Camera"
       - id: hidden_in_editor
         type: u1
         doc: 0 or 1
   # Ambient Sounds
   ambient_sounds_section:
     seq:
-      - id: count
+      - id: num_ambient_sounds
         type: u4
       - id: ambient_sounds
         type: ambient_sound
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_ambient_sounds
   ambient_sound:
     seq:
       - id: uid
@@ -582,12 +581,12 @@ types:
   # Events
   events_section:
     seq:
-      - id: count
+      - id: num_events
         type: u4
       - id: events
         type: event
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_events
   event:
     seq:
       - id: uid
@@ -628,15 +627,15 @@ types:
         type: color
         if: _root.header.version >= 0xB0
   # Multiplayer Respawn Points
-  mp_respawns_section:
+  mp_respawn_points_section:
     seq:
-      - id: count
+      - id: num_mp_respawn_points
         type: u4
-      - id: mp_respawns
-        type: mp_respawn
+      - id: mp_respawn_points
+        type: mp_respawn_point
         repeat: expr
-        repeat-expr: count
-  mp_respawn:
+        repeat-expr: num_mp_respawn_points
+  mp_respawn_point:
     seq:
       - id: uid
         type: u4
@@ -678,12 +677,12 @@ types:
   # Particle Emitters
   particle_emitters_section:
     seq:
-      - id: count
+      - id: num_particle_emitters
         type: u4
       - id: particle_emitters
         type: particle_emitter
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_particle_emitters
   particle_emitter:
     seq:
       - id: uid
@@ -770,12 +769,12 @@ types:
   # Gas Regions
   gas_regions_section:
     seq:
-      - id: count
+      - id: num_gas_regions
         type: u4
       - id: gas_regions
         type: gas_region
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_gas_regions
   gas_region:
     seq:
       - id: uid
@@ -815,12 +814,12 @@ types:
   # Room Effects
   room_effects_section:
     seq:
-      - id: count
+      - id: num_room_effects
         type: u4
       - id: room_effects
         type: room_effect
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_room_effects
   room_effect:
     seq:
       - id: effect_type
@@ -880,21 +879,18 @@ types:
         type: u4
       - id: texture_angle_degrees
         type: f4
-      - id: texture_scroll_rate_u
-        type: f4
-        doc: times/s
-      - id: texture_scroll_rate_v
-        type: f4
+      - id: texture_scroll_rate
+        type: uv
         doc: times/s
   # Climbing Regions
   climbing_regions_section:
     seq:
-      - id: count
+      - id: num_climbing_regions
         type: u4
       - id: climbing_regions
         type: climbing_region
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_climbing_regions
   climbing_region:
     seq:
       - id: uid
@@ -920,12 +916,12 @@ types:
   # Bolt Emitters
   bolt_emitter_section:
     seq:
-      - id: count
+      - id: num_bolt_emitters
         type: u4
       - id: bolt_emitters
         type: bolt_emitter
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_bolt_emitters
   bolt_emitter:
     seq:
       - id: uid
@@ -953,7 +949,7 @@ types:
         type: f4
       - id: jitter
         type: f4
-      - id: segments_count
+      - id: num_segments
         type: u4
       - id: spawn_delay
         type: f4
@@ -976,12 +972,12 @@ types:
   # Targets
   targets_section:
     seq:
-      - id: count
+      - id: num_targets
         type: u4
       - id: targets
         type: target
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_targets
   target:
     seq:
       - id: uid
@@ -1002,12 +998,12 @@ types:
   # Decals
   decals_section:
     seq:
-      - id: count
+      - id: num_decals
         type: u4
       - id: decals
         type: decal
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_decals
   decal:
     seq:
       - id: uid
@@ -1041,12 +1037,12 @@ types:
   # Push Regions
   push_regions_section:
     seq:
-      - id: count
+      - id: num_push_regions
         type: u4
       - id: push_regions
         type: push_region
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_push_regions
   push_region:
     seq:
       - id: uid
@@ -1083,12 +1079,12 @@ types:
   # Lightmaps
   lightmaps_section:
     seq:
-      - id: count
+      - id: num_lightmaps
         type: u4
       - id: lightmaps
         type: lightmap
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_lightmaps
   lightmap:
     seq:
       - id: w
@@ -1103,21 +1099,21 @@ types:
   # Movers
   movers_section:
     seq:
-      - id: count
+      - id: num_movers
         type: u4
       - id: movers
         type: brush
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_movers
   # Moving groups / Groups
   groups_section:
     seq:
-      - id: count
+      - id: num_groups
         type: u4
       - id: groups
         type: group
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_groups
   group:
     seq:
       - id: name
@@ -1137,16 +1133,16 @@ types:
         type: uid_list
   moving_group_data:
     seq:
-      - id: keyframes_count
+      - id: num_keyframes
         type: u4
       - id: keyframes
         type: keyframe
         repeat: expr
-        repeat-expr: keyframes_count
-      - id: unkown_count1
+        repeat-expr: num_keyframes
+      - id: num_unkown1
         type: u4
       - id: unkown1
-        size: unkown_count1 * 52
+        size: num_unkown1 * 52
         doc: clearly id, pos, rot; but why?
       - id: is_door
         type: u1
@@ -1221,12 +1217,12 @@ types:
   # Cutscenes
   cutscenes_section:
     seq:
-      - id: count
+      - id: num_cutscenes
         type: u4
       - id: cutscenes
         type: cutscene
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_cutscenes
   cutscene:
     seq:
       - id: uid
@@ -1235,12 +1231,12 @@ types:
         type: u1
       - id: fov
         type: f4
-      - id: shots_count
+      - id: num_shots
         type: u4
       - id: shots
         type: cutscene_shot
         repeat: expr
-        repeat-expr: shots_count
+        repeat-expr: num_shots
   cutscene_shot:
     seq:
       - id: camera_uid
@@ -1260,12 +1256,12 @@ types:
   # Cutscene Path Nodes
   cutscene_path_nodes_section:
     seq:
-      - id: count
+      - id: num_cutscene_path_nodes
         type: u4
       - id: cutscene_path_nodes
         type: cutscene_path_node
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_cutscene_path_nodes
   cutscene_path_node:
     seq:
       - id: uid
@@ -1284,97 +1280,97 @@ types:
   # Cutscene Paths
   cutscene_paths_section:
     seq:
-      - id: count
+      - id: num_cutscene_paths
         type: u4
       - id: cutscene_paths
         type: cutscene_path
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_cutscene_paths
   cutscene_path:
     seq:
       - id: name
         type: vstring
-      - id: path_nodes_count
+      - id: num_path_nodes
         type: u4
       - id: path_nodes
         type: u4
         repeat: expr
-        repeat-expr: path_nodes_count
+        repeat-expr: num_path_nodes
   # TGA Files
   tga_files_section:
     seq:
-      - id: tga_files_count
+      - id: num_tga_files
         type: u4
       - id: tga_files
         type: vstring
         repeat: expr
-        repeat-expr: tga_files_count
+        repeat-expr: num_tga_files
         doc: many files, not textures
   # VCM Files
   vcm_files_section:
     seq:
-      - id: vcm_files_count
+      - id: num_vcm_files
         type: u4
       - id: vcm_files
         type: vstring
         repeat: expr
-        repeat-expr: vcm_files_count
+        repeat-expr: num_vcm_files
       - id: unknown
         type: u4
         repeat: expr
-        repeat-expr: vcm_files_count
+        repeat-expr: num_vcm_files
         doc: typically 1
   # MVF Files
   mvf_files_section:
     seq:
-      - id: mvf_files_count
+      - id: num_mvf_files
         type: u4
       - id: mvf_files
         type: vstring
         repeat: expr
-        repeat-expr: mvf_files_count
+        repeat-expr: num_mvf_files
       - id: unknown
         type: u4
         repeat: expr
-        repeat-expr: mvf_files_count
+        repeat-expr: num_mvf_files
         doc: typically 1 or 2
   # V3D Files
   v3d_files_section:
     seq:
-      - id: v3d_files_count
+      - id: num_v3d_files
         type: u4
       - id: v3d_files
         type: vstring
         repeat: expr
-        repeat-expr: v3d_files_count
+        repeat-expr: num_v3d_files
       - id: unknown
         type: u4
         repeat: expr
-        repeat-expr: v3d_files_count
+        repeat-expr: num_v3d_files
         doc: typically 1 or 2
   # VFX Files
   vfx_files_section:
     seq:
-      - id: vfx_files_count
+      - id: num_vfx_files
         type: u4
       - id: vfx_files
         type: vstring
         repeat: expr
-        repeat-expr: vfx_files_count
+        repeat-expr: num_vfx_files
       - id: unknown
         type: u4
         repeat: expr
-        repeat-expr: vfx_files_count
+        repeat-expr: num_vfx_files
         doc: typically 1
   # EAX Effects
   eax_effects_section:
     seq:
-      - id: count
+      - id: num_eax_effects
         type: u4
       - id: eax_effects
         type: eax_effect
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_eax_effects
   eax_effect:
     seq:
       - id: effect_type
@@ -1397,36 +1393,36 @@ types:
   # Waypoint Lists
   waypoint_lists_section:
     seq:
-      - id: count
+      - id: num_waypoint_lists
         type: u4
       - id: waypoint_lists
         type: waypoint_list
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_waypoint_lists
   waypoint_list:
     seq:
       - id: name
         type: vstring
-      - id: count
+      - id: num_waypoints
         type: u4
       - id: waypoints
         type: u4
         repeat: expr
-        repeat-expr: count
-        doc: probably index in waypoints objects array
+        repeat-expr: num_waypoints
+        doc: indices in nav_points_section::nav_points array
   # Nav Points
   nav_points_section:
     seq:
-      - id: count
+      - id: num_nav_points
         type: u4
       - id: nav_points
         type: nav_point
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_nav_points
       - id: nav_point_connections
         type: nav_point_connections
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_nav_points
   nav_point:
     seq:
       - id: uid
@@ -1464,21 +1460,22 @@ types:
         type: uid_list
   nav_point_connections:
     seq:
-      - id: count
+      - id: num_indices
         type: u1
       - id: indices
         type: u4
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_indices
+        doc: indices in nav_points_section::nav_points array
   # Entities
   entities_section:
     seq:
-      - id: count
+      - id: num_entities
         type: u4
       - id: entities
         type: entity
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_entities
   entity:
     seq:
       - id: uid
@@ -1635,12 +1632,12 @@ types:
   # Items
   items_section:
     seq:
-      - id: count
+      - id: num_items
         type: u4
       - id: items
         type: item
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_items
   item:
     seq:
       - id: uid
@@ -1666,12 +1663,12 @@ types:
   # Clutters
   clutters_section:
     seq:
-      - id: count
+      - id: num_clutters
         type: u4
       - id: clutters
         type: clutter
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_clutters
   clutter:
     seq:
       - id: uid
@@ -1698,12 +1695,12 @@ types:
   # Triggers
   triggers_section:
     seq:
-      - id: count
+      - id: num_triggers
         type: u4
-      - id: trigger
+      - id: triggers
         type: trigger
         repeat: expr
-        repeat-expr: count
+        repeat-expr: num_triggers
   trigger:
     seq:
       - id: uid
@@ -1719,7 +1716,7 @@ types:
         enum: trigger_shape
       - id: resets_after
         type: f4
-      - id: resets_count
+      - id: resets_times
         type: s4
         doc: -1 - infinity
       - id: is_use_key_required
@@ -1763,21 +1760,21 @@ types:
         type: u1
         if: shape != trigger_shape::sphere
         doc: 1 or 0
-      - id: airlock_room
+      - id: airlock_room_uid
         type: s4
         doc: UID, -1 if empty
-      - id: attached_to
+      - id: attached_to_uid
         type: s4
         doc: UID, -1 if empty
-      - id: use_clutter
+      - id: use_clutter_uid
         type: s4
         doc: UID, -1 if empty
       - id: disabled
         type: u1
         doc: 1 or 0
-      - id: button_active_time
+      - id: button_active_time_seconds
         type: f4
-      - id: inside_time
+      - id: inside_time_seconds
         type: f4
       - id: team
         type: s4
@@ -1831,12 +1828,12 @@ types:
   # Brushes
   brushes_section:
     seq:
-      - id: brushes_count
+      - id: num_brushes
         type: u4
       - id: brushes
         type: brush
         repeat: expr
-        repeat-expr: brushes_count
+        repeat-expr: num_brushes
   brush:
     seq:
       - id: uid
@@ -1864,7 +1861,7 @@ enums:
     0x00000400: cutscene_cameras
     0x00000500: ambient_sounds
     0x00000600: events
-    0x00000700: mp_respawns
+    0x00000700: mp_respawn_points
     0x00000900: level_properties
     0x00000a00: particle_emitters
     0x00000b00: gas_regions
