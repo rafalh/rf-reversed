@@ -359,9 +359,6 @@ types:
         type: face_lighting_data
         repeat: expr
         repeat-expr: num_face_lighting_data
-      - id: unknown5
-        type: u4
-        if: _root.header.version == 0xB4
       - id: legacy_num_face_scroll_data
         type: u4
         if: _root.header.version <= 0xB4
@@ -435,8 +432,8 @@ types:
         repeat-expr: 4
         doc: related to position and size in 3d space
       - id: room_index
-        type: u4
-        doc: index in rooms
+        type: s4
+        doc: index in rooms, sometimes -1
   # Geo Regions
   geo_regions_section:
     seq:
