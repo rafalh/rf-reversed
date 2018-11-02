@@ -260,8 +260,8 @@ types:
         type: s4
         doc: index in geometry::face_lighting_data array or -1 if no lightmap is used
       - id: face_id
-        type: u4
-        doc: before building geometry an ID can be ambiguous
+        type: s4
+        doc: before building geometry an ID can be ambiguous; -1 for liquid surface
       - id: unknown1
         size: 8
         doc: typically FF FF FF FF FF FF FF FF
@@ -1897,7 +1897,7 @@ enums:
   face_flags:
     0x01: show_sky
     0x02: mirrored
-    0x04: unknown
+    0x04: liquid_surface
     0x08: is_detail
     0x20: full_bright
     0x40: unknown2
