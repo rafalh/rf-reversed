@@ -1129,8 +1129,10 @@ types:
         if: is_moving != 0
       - id: objects
         type: uid_list
+        doc: non-brush members
       - id: brushes
         type: uid_list
+        doc: brush-only members
   moving_group_data:
     seq:
       - id: num_keyframes
@@ -1139,11 +1141,13 @@ types:
         type: keyframe
         repeat: expr
         repeat-expr: num_keyframes
-      - id: num_unkown1
+      - id: num_member_transforms
         type: u4
-      - id: unkown1
-        size: num_unkown1 * 52
-        doc: clearly id, pos, rot; but why?
+      - id: member_transforms
+        type: moving_group_member_transform
+        repeat: expr
+        repeat-expr: num_member_transforms
+        doc: transform applied to keyframe to get each member transform
       - id: is_door
         type: u1
         doc: 0 or 1
@@ -1183,6 +1187,14 @@ types:
         type: vstring
       - id: close_vol
         type: f4
+  moving_group_member_transform:
+    seq:
+      - id: uid
+        type: u4
+      - id: pos
+        type: vec3
+      - id: rot
+        type: mat3
   keyframe:
     seq:
       - id: uid
@@ -1900,8 +1912,8 @@ enums:
     0x04: liquid_surface
     0x08: is_detail
     0x20: full_bright
-    0x40: unknown2
-    0x80: unknown3
+    0x40: unknown1
+    0x80: unknown2
   brush_flags:
     0x1:  portal
     0x2:  air
