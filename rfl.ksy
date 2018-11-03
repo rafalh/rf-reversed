@@ -173,10 +173,10 @@ types:
       - id: is_airlock
         type: u1
         doc: 1 or 0
-      - id: liquid_room
+      - id: is_liquid_room
         type: u1
         doc: 1 or 0
-      - id: ambient_light
+      - id: has_ambient_light
         type: u1
         doc: 1 or 0
       - id: is_subroom
@@ -191,49 +191,43 @@ types:
       - id: eax_effect
         type: vstring
         if: _root.header.version >= 0xB4
-      - id: liquid_depth
-        type: f4
-        if: liquid_room == 1
-      - id: liquid_color
+      - id: liquid_properties
+        type: room_liquid_properties
+        if: is_liquid_room == 1
+      - id: ambient_color
         type: color
-        if: liquid_room == 1
-      - id: liquid_surface_texture
-        type: vstring
-        if: liquid_room == 1
-      - id: liquid_visibility
+        if: has_ambient_light == 1
+  room_liquid_properties:
+    doc: similar to room_effect_liquid_properties
+    seq:
+      - id: depth
         type: f4
-        if: liquid_room == 1
+      - id: color
+        type: color
+      - id: surface_texture
+        type: vstring
+      - id: visibility
+        type: f4
       - id: liquid_type
         type: u4
         enum: liquid_type
-        if: liquid_room == 1
       - id: liquid_alpha
         type: u4
-        if: liquid_room == 1
-      - id: liquid_contains_plankton
+      - id: contains_plankton
         type: u1
         doc: 0 or 1
-        if: liquid_room == 1
-      - id: liquid_texture_pixels_per_meter_u
+      - id: texture_pixels_per_meter_u
         type: u4
-        if: liquid_room == 1
-      - id: liquid_texture_pixels_per_meter_v
+      - id: texture_pixels_per_meter_v
         type: u4
-        if: liquid_room == 1
-      - id: liquid_texture_angle_radians
+      - id: texture_angle_radians
         type: f4
-        if: liquid_room == 1
-      - id: liquid_waveform
+      - id: waveform
         type: s4
-        if: liquid_room == 1
         doc: -1 - None, 0 - Calm, 1 - Choppy
-      - id: liquid_texture_scroll_rate
+      - id: texture_scroll_rate
         type: uv
-        if: liquid_room == 1
         doc: times/s
-      - id: ambient_color
-        type: color
-        if: ambient_light == 1
   vertex:
     seq:
       - id: index
@@ -999,6 +993,7 @@ types:
         type: u1
         doc: 0 or 1
   room_effect_liquid_properties:
+    doc: similar to room_liquid_properties
     seq:
       - id: waveform
         type: u4
