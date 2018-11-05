@@ -21,7 +21,7 @@ types:
       - id: signature
         contents: [0x55, 0xDA, 0xBA, 0xD4]
       - id: version
-        doc: 0xC8 is the last supported version in RF 1.2, standard maps has version 0xB4
+        doc: 0xC8 is the last supported version in RF 1.2, standard PC levels use version 0xB4, PS2 levels use versions 0xAE and 0xAF
         type: u4
       - id: timestamp
         type: u4
@@ -1981,6 +1981,7 @@ types:
       - id: team
         type: s4
         enum: trigger_team
+        if: _root.header.version >= 0xB1
       - id: links
         type: uid_list
   # Player Start
@@ -2088,6 +2089,7 @@ enums:
     0x00000500: ambient_sounds
     0x00000600: events
     0x00000700: mp_respawn_points
+    0x00000800: unknown_800
     0x00000900: level_properties
     0x00000a00: particle_emitters
     0x00000b00: gas_regions
