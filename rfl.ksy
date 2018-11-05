@@ -476,16 +476,16 @@ types:
         type: vec3
       - id: rot
         type: mat3
-        if: flags.sphere
+        if: not flags.sphere
       - id: width
         type: f4
-        if: flags.sphere
+        if: not flags.sphere
       - id: height
         type: f4
-        if: flags.sphere
+        if: not flags.sphere
       - id: depth
         type: f4
-        if: flags.sphere
+        if: not flags.sphere
       - id: radius
         type: f4
         if: flags.sphere
