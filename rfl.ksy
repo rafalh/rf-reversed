@@ -182,9 +182,9 @@ types:
       - id: is_subroom
         type: u1
         doc: 1 or 0
-      - id: unknown
+      - id: has_alpha
         type: u1
-        doc: typically 0
+        doc: 1 or 0, 1 if any face has texture with alpha channel, updated by RED only if brush has is_detail flag
       - id: life
         type: f4
         doc: -1.0f == infinite
@@ -270,7 +270,7 @@ types:
         doc: 1 - default, 8 - lowest, 9 - low, A - high, B - highest
       - id: unknown2
         type: u2
-        doc: typically 0
+        doc: always 0
       - id: smoothing_groups
         type: u4
         doc: each bit controls one smoothing group
@@ -285,9 +285,12 @@ types:
   face_flags:
     doc: 8 bit long bitfield
     seq:
-      - id: reserved1
-        type: b2
-        doc: value & 0xC0
+      - id: has_holes
+        type: b1
+        doc: value & 0x80, 1 if source brush has is_detail flag and texture has pixels with alpha channel < 50%, holes are taken into account when shooting
+      - id: has_alpha
+        type: b1
+        doc: value & 0x40, 1 if source brush has is_detail flag and texture has alpha channel
       - id: full_bright
         type: b1
         doc: value & 0x20
@@ -296,7 +299,7 @@ types:
         doc: value & 0x10
       - id: is_detail
         type: b1
-        doc: value & 0x08
+        doc: value & 0x08, 1 if source brush has is_detail flag
       - id: liquid_surface
         type: b1
         doc: value & 0x04
