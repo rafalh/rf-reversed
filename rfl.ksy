@@ -1912,7 +1912,9 @@ types:
         type: u4
       - id: script_name
         type: vstring
-        doc: depends on type
+        doc: depends on trigger type,
+             if first byte is 0xAB then second byte contains Pure Faction
+             flags (0x2 = clientside, 0x4 = solo, 0x8 = teleport)
       - id: hidden_in_editor
         type: u1
         doc: 0 or 1
