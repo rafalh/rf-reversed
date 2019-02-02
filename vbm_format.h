@@ -9,34 +9,18 @@
 *****************************************************************************/
 
 /**
-VBM (what does it stand for? maybe Volition Bit Map ?)
-
-These files contain potentially animated images.
-Each frame can be encoded with more than one resolution - each of these is called a "mipmap"
-Where multiple mipmaps are available each successive image is 1/4 of the size of the previous.
-ie. 1/2 height and 1/2 width.
+ * VBM (Volition Bitmap file)
+ *
+ * VBM is a proprietary Volition image file format used in Red Faction game.
+ * VBM files are either static (only one frame) or animated (multiple frames are included).
+ * Each frame contains pixel data for one or more mipmap levels.
+ * 
+ * Note: all fields are little-endian. On big-endian architecture bytes needs to be swapped.
 **/
 
-#ifndef VBM_FORMAT_H_INCLUDED
-#define VBM_FORMAT_H_INCLUDED
+#pragma once
 
 #include <stdint.h>
-
-#ifdef C_ASSERT
-#undef C_ASSERT
-#define HAS_C_ASSERT
-#endif
-#define C_ASSERT(e) extern void __C_ASSERT__##__LINE__(int [(e)?1:-1])
-
-C_ASSERT(sizeof(float) == 4);
-
-#ifndef HAS_C_ASSERT
-#undef C_ASSERT
-#endif
-
-#ifdef __BIG_ENDIAN__
-#error Big Endian not supported
-#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4200)
@@ -55,45 +39,45 @@ enum vbm_color_format_t
 
 struct vbm_header_t
 {
-    uint32_t signature;      /* VBM_SIGNATURE */
-    uint32_t version;        /* sometimes 1, sometimes 2 - vbm format version perhaps? */
-    uint32_t width;
-    uint32_t height;
-    uint32_t format;         /* see vbm_color_format_t */
-    uint32_t fps;            /* frames per second */
-    uint32_t frames_count;   /* number of frames */
-    uint32_t mipmaps_count;  /* number of mipmaps */
+    uint32_t signature;    // should be equal to VBM_SIGNATURE
+    uint32_t version;      // RF uses 1 and 2, makeVBM tool always creates files with version 1 */
+    uint32_t width;        // nominal image width
+    uint32_t height;       // nominal image height
+    uint32_t format;       // pixel data format, see vbm_color_format_t
+    uint32_t fps;          // frames per second, ignored if frames_count == 1
+    uint32_t num_frames;   // number of frames, always 1 for not animated VBM
+    uint32_t num_mipmaps;  // number of mipmap levels except for the full size (level 0)
 };
 
-#if 0
+#if 0 // pseudocode
 
 struct vbm_file_t
 {
-    vbm_header_t    vbm_header;     /* A VBM is made from a header */
-    vbm_frame_t     frames[];       /* and a sequence of frames */
+    vbm_header_t  vbm_header;                        // file header
+    vbm_frame_t   frames[vbm_header_t::num_frames];  // sequence of frames (at least one)
 };
 
 struct vbm_frame_t
 {
-    vbm_mipmap_t    mipmaps[];      /* A frame is made of one or more mipmaps */
+    vbm_mipmap_t  mipmaps[vbm_header_t::num_mipmaps + 1];  // A frame is made of one or more mipmaps
 };
 
 struct vbm_mipmap_t
 {
-    vbm_pixel_t     pixels[];       /* Mipmaps are composed of 16bpp images in one of three formats */
+    vbm_pixel_t pixels[];  // Mipmaps are 16bpp images in one of three pixel formats (see format field in header)
 };
 
-#endif // 0
+#endif // pseudocode
 
 union vbm_pixel_t
 {
-    uint16_t    raw_pixel_data;     /* Pixels are 16 bits wide in "little endian" byte order */
+    uint16_t    raw_pixel_data; // Pixels are 16 bits wide in "little endian" byte order
     struct
     {
         uint8_t blue:   5;
         uint8_t green:  5;
         uint8_t red:    5;
-        uint8_t nalpha: 1; // is it ok?
+        uint8_t nalpha: 1; // in version 1 inverted alpha (0 - opaqua, 1 - transparent), in version 2 field is not inverted anymore
     } cf_1555;
     struct
     {
@@ -111,5 +95,3 @@ union vbm_pixel_t
 };
 
 #pragma pack(pop)
-
-#endif // V3D_FORMAT_H_INCLUDED
