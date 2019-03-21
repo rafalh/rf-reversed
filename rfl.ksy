@@ -559,14 +559,15 @@ types:
         type: f4
       - id: intensity_at_max_range
         type: f4
-      - id: unknown1
+      - id: dropoff_type
         type: u4
-        doc: typicaly 0-3
+        enum: light_dropoff_type
+        doc: editable in RED in game version 1.00, removed in 1.10 patch
       - id: tube_light_width
         type: f4
       - id: intensity
         type: f4
-      - id: unknown2
+      - id: unknown
         size: 20
         doc: typically [1.0f, 0.0f, 0.0f, 1.0f, 0.0f]
   light_flags:
@@ -2135,6 +2136,11 @@ enums:
     1: omnidirectional
     2: circular_spotlight
     3: tube_light
+  light_dropoff_type:
+    0: linear
+    1: squared
+    2: cosine
+    3: sqrt
   entity_ai_mode:
     0: catatonic
     1: waiting
