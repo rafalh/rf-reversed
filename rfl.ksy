@@ -265,9 +265,6 @@ types:
       - id: flags
         type: face_flags
         doc: flags can differ depending on section (e.g. is_detail flag is used in static_geometry but not in brushes)
-      - id: lightmap_res
-        type: u1
-        doc: 1 - default, 8 - lowest, 9 - low, A - high, B - highest
       - id: reserved2
         type: u2
         doc: always 0
@@ -283,7 +280,7 @@ types:
         repeat: expr
         repeat-expr: num_vertices
   face_flags:
-    doc: 8 bit long bitfield
+    doc: 16 bit long bitfield
     seq:
       - id: has_holes
         type: b1
@@ -309,6 +306,18 @@ types:
       - id: show_sky
         type: b1
         doc: value & 0x01
+      - id: reserved1
+        type: b2
+        doc: value & 0xC000
+      - id: is_invisible
+        type: b1
+        doc: value & 0x2000, face is not rendered but still collidable, flag is set only in compiled geometry if all faces of detail brush have invisible textures
+      - id: reserved2
+        type: b3
+        doc: value & 0x1C00
+      - id: lightmap_resolution
+        type: b2
+        doc: value & 0x0300, 0 - lowest, 1 - low, 2 - high, 3 - highest
   face_scroll_data:
     seq:
       - id: face_id
