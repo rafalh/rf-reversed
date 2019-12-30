@@ -745,9 +745,9 @@ types:
         type: u4
       - id: ambient_color
         type: color
-      - id: unknown
+      - id: directional_ambient_light
         type: u1
-        doc: typically 0
+        doc: if 1 ambient_color is used to create directional light with direction <0.5, -1.0, 0.0>, always set to 0 by editor
       - id: fog_color
         type: color
       - id: fog_near_plane
