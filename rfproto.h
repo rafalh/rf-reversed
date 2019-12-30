@@ -603,9 +603,9 @@ enum rfAnimFlags
 {
     RF_AF_HIDDEN_WEAPON = 0x01, // not used in multi
     RF_AF_CROUCH        = 0x04,
-	RF_AF_ZOOM          = 0x08,
+    RF_AF_ZOOM          = 0x08,
     RF_AF_WEAPON_FIRE   = 0x10, // used only for remote charges and granades
-	RF_AF_WEAPON_FIRE2  = 0x20, // unknown
+    RF_AF_WEAPON_FIRE2  = 0x20, // unknown
 };
 
 typedef struct _rfEntityData
