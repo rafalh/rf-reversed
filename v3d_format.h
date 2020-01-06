@@ -40,9 +40,10 @@ struct v3d_file_header
     uint32_t num_all_vertices;  // ccrunch resets to 0
     uint32_t num_all_triangles; // ccrunch resets to 0
     uint32_t unknown0;          // ccrunch resets to 0
-    uint32_t num_all_materials; // total number of materials in all submeshes
+    uint32_t num_all_materials; // total number of materials in all submeshes, sum of v3d_submesh::num_materials
+                                // from all submesh sections
+    uint32_t unknown1;          // always 0 in game files
     uint32_t unknown2;          // always 0 in game files
-    uint32_t unknown3;          // always 0 in game files
     uint32_t num_colspheres;    // number of colsphere sections
 };
 
@@ -267,7 +268,7 @@ struct v3d_submesh_lod
     int32_t unknown1;         // -1, sometimes 0
     struct v3d_batch_info batch_info[num_batches];
     uint32_t num_prop_points; // number of prop points, usually 0 or 1
-    uint32_t num_textures;    // number of textures used by this LOD
+    uint32_t num_textures;    // number of textures used by this LOD, max 7
     struct v3d_lod_texture textures[num_textures]; // textures used by this LOD
 };
 
