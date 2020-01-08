@@ -66,7 +66,7 @@ types:
             'section_type::gas_regions': gas_regions_section
             'section_type::room_effects': room_effects_section
             'section_type::climbing_regions': climbing_regions_section
-            'section_type::bolt_emitters': bolt_emitter_section
+            'section_type::bolt_emitters': bolt_emitters_section
             'section_type::targets': targets_section
             'section_type::decals': decals_section
             'section_type::push_regions': push_regions_section
@@ -1065,7 +1065,7 @@ types:
       - id: extents
         type: vec3
   # Bolt Emitters
-  bolt_emitter_section:
+  bolt_emitters_section:
     seq:
       - id: num_bolt_emitters
         type: u4
