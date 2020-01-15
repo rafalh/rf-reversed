@@ -67,8 +67,8 @@ struct rfa_file_header
     uint32_t start_time;
     uint32_t end_time;
     uint32_t num_bones;
-    uint32_t num_morph_vertices;
-    uint32_t num_morph_keyframes;
+    int32_t num_morph_vertices;
+    int32_t num_morph_keyframes;
     uint32_t ramp_in_time; // ramp in * 160
     uint32_t ramp_out_time; // ramp out * 160
     struct rfa_quaternion unk3;
@@ -132,6 +132,7 @@ struct rfa_morph_keyframes8
     if (rfa_file_header::num_morph_keyframes * rfa_file_header::num_morph_vertices > 0) {
         struct rfa_aabb aabb;
     }
+    // positions relative to aabb (0 -> aabb.min, 255 -> aabb.max)
     struct rfa_vec3_u8 positions[rfa_file_header::num_morph_keyframes][rfa_file_header::num_morph_vertices];
 };
 
