@@ -69,7 +69,6 @@ struct v3d_batch_info
 {
     uint16_t num_vertices;
     uint16_t num_triangles;
-    // some size values are with alignment
     uint16_t positions_size;
     uint16_t indices_size;
     uint16_t same_pos_vertex_offsets_size;
@@ -171,11 +170,11 @@ struct v3d_lod_prop
 // Flags for v3d_submesh_lod
 enum v3d_lod_flags
 {
-    V3D_LOD_FLAG_1          = 0x01, // unknown, used by characters
-    V3D_LOD_FLAG_2          = 0x02, // unknown, used by characters
-    V3D_LOD_FLAG_10         = 0x10, // use most detailed LOD for collisions instead of least detailed, used by driller01.v3m
-    V3D_LOD_TRIANGLE_PLANES = 0x20, // causes v3d_batch_data::planes to be included, used by static meshes,
-                                    // should be set if any triangle does not have V3D_TRI_DOUBLE_SIDED flag
+    V3D_LOD_MORPH_VERTICES_MAP = 0x01, // include morph vertices mapping in v3d_batch_data, used by characters
+    V3D_LOD_FLAG_2             = 0x02, // unknown, used by characters
+    V3D_LOD_FLAG_10            = 0x10, // use most detailed LOD for collisions instead of least detailed, used by driller01.v3m
+    V3D_LOD_TRIANGLE_PLANES    = 0x20, // causes v3d_batch_data::planes to be included, used by static meshes,
+                                       // should be set if any triangle does not have V3D_TRI_DOUBLE_SIDED flag
 };
 
 // Spheres used for collision detection by characters (used in V3C files)
@@ -233,9 +232,11 @@ struct v3d_batch_data
         struct v3d_vertex_bones bone_links[v3d_batch_info::num_vertices]; // links vertices with bones
         V3D_MESH_DATA_PADDING();
     }
-    if (v3d_submesh_lod::flags & 0x1)
+    if (v3d_submesh_lod::flags & V3D_LOD_MORPH_VERTICES_MAP)
     {
-        float unknown2[v3d_submesh_lod::unknown0 * 2];
+        int16_t morph_vertices_map[v3d_submesh_lod::num_vertices]; // maps indices from RFA morph animation
+                                                                   // (rfa_morph_vertices::vertex_indices) to indices
+                                                                   // in this batch
         V3D_MESH_DATA_PADDING();
     }
 };
@@ -261,8 +262,8 @@ struct v3d_lod_texture
 struct v3d_submesh_lod
 {
     uint32_t flags;           // see v3d_lod_flags
-    uint32_t unknown0;        // unknown, can be 0
-    uint16_t num_batches;     // number of gemoetry batches
+    uint32_t num_vertices;    // number of vertices
+    uint16_t num_batches;     // number of geometry batches
     uint32_t data_size;       // size of data
     char data[data_size];     // actual geometry data, see v3d_lod_mesh_data
     int32_t unknown1;         // -1, sometimes 0
