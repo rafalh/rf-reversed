@@ -196,6 +196,8 @@ struct v3d_bone
     int32_t parent;      // index of parent bone (-1 for root)
 };
 
+#define V3D_MAX_BONES 50 // maximal number of bones
+
 // Note:
 // Structures described below use variable-size arrays and conditional fields existence.
 // They cannot be defined using C/C++ so they were described using C-like pseudo-code.
@@ -304,7 +306,7 @@ struct v3d_submesh
 struct v3d_bones
 {
     struct v3d_section_header hdr;    // type is V3D_BONE
-    uint32_t num_bones;               // number of bones
+    uint32_t num_bones;               // number of bones (for limit see V3D_MAX_BONES)
     struct v3d_bone bones[num_bones]; // bones array
 };
 
