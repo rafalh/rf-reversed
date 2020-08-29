@@ -574,36 +574,41 @@ types:
         doc: editable in RED in game version 1.00, removed in 1.10 patch
       - id: tube_light_width
         type: f4
-      - id: intensity
+      - id: on_intensity
         type: f4
-      - id: unknown
-        size: 20
-        doc: typically [1.0f, 0.0f, 0.0f, 1.0f, 0.0f]
+      - id: on_time
+        type: f4
+      - id: on_time_variation
+        type: f4
+      - id: off_intensity
+        type: f4
+      - id: off_time
+        type: f4
+      - id: off_time_variation
+        type: f4
   light_flags:
     doc: 32 bit long bitfield
     seq:
-      - id: reserved1
-        type: b2
-        doc: value & 0xC0
-      - id: light_type
-        type: b2
+      - id: raw
+        type: u4
+    instances:
+      dynamic:
+        value: (raw & 0x00000001) != 0
+      fade:
+        value: (raw & 0x00000002) != 0
+      shadow_casting:
+        value: (raw & 0x00000004) != 0
+      is_enabled:
+        value: (raw & 0x00000008) != 0
+      light_type:
+        value: (raw & 0x00000030) >> 4
         enum: light_type
-        doc: value & 0x30
-      - id: is_enabled
-        type: b1
-        doc: value & 0x08
-      - id: shadow_casting
-        type: b1
-        doc: value & 0x04
-      - id: unknown_2
-        type: b1
-        doc: value & 0x02
-      - id: dynamic
-        type: b1
-        doc: value & 0x01
-      - id: reserved2
-        type: b24
-        doc: value & 0xFFFFFF00
+      initial_state:
+        value: (raw & 0x00000F00) >> 8
+        enum: light_state
+      runtime_shadow:
+        value: (raw & 0x00002000) != 0
+
   # Cutscene Cameras
   cutscene_cameras_section:
     seq:
@@ -2150,6 +2155,11 @@ enums:
     1: squared
     2: cosine
     3: sqrt
+  light_state:
+    1: off
+    2: on
+    3: off_alternating
+    4: on_alternating
   entity_ai_mode:
     0: catatonic
     1: waiting
