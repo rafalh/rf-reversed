@@ -1539,7 +1539,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: num_vcm_files
-        doc: typically 1
+        doc: typically 1, unused by the game engine
   # MVF Files
   mvf_files_section:
     seq:
@@ -1553,7 +1553,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: num_mvf_files
-        doc: typically 1 or 2
+        doc: typically 1 or 2, unused by the game engine
   # V3D Files
   v3d_files_section:
     seq:
@@ -1567,7 +1567,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: num_v3d_files
-        doc: typically 1 or 2
+        doc: typically 1 or 2, unused by the game engine
   # VFX Files
   vfx_files_section:
     seq:
@@ -1581,7 +1581,7 @@ types:
         type: u4
         repeat: expr
         repeat-expr: num_vfx_files
-        doc: typically 1
+        doc: typically 1, unused by the game engine
   # EAX Effects
   eax_effects_section:
     seq:
@@ -1665,12 +1665,12 @@ types:
       - id: rot
         type: mat3
         if: directional != 0
-      - id: unknown1
+      - id: cover
         type: u1
-        doc: typically 0
-      - id: unknown2
+        doc: typically 0, a RED bug causes clearing of this field after level save
+      - id: hide
         type: u1
-        doc: typically 0
+        doc: typically 0, a RED bug causes clearing of this field after level save
       - id: crunch
         type: u1
         doc: 0 or 1
@@ -1726,7 +1726,7 @@ types:
         type: vstring
       - id: unknown1
         type: u1
-        doc: typically 0
+        doc: typically 0, unused by the game engine
       - id: boarded
         type: u1
         doc: 1 or 0
@@ -1751,10 +1751,10 @@ types:
         doc: 1 or 0
       - id: unknown2
         type: u1
-        doc: typically 0
+        doc: editor always sets it to 0, unknown purpose
       - id: start_crouched
         type: u1
-        doc: 1 or 0
+        doc: 1 or 0, unused by the game engine
       - id: life
         type: f4
       - id: armor
@@ -1784,7 +1784,7 @@ types:
         enum: entity_ai_attack_style
       - id: unknown3
         type: u4
-        doc: typically 0
+        doc: typically 0, unused by the game engine
       - id: turret_uid
         type: s4
       - id: alert_camera_uid
@@ -1907,7 +1907,7 @@ types:
         doc: 0 or 1
       - id: unknown
         type: u4
-        doc: typically 0
+        doc: typically 0, unused by the game engine
       - id: skin
         type: vstring
       - id: links
@@ -2016,7 +2016,7 @@ types:
     seq:
       - id: unknown
         type: u4
-        doc: typically 1
+        doc: typically 1, unused by the game engine
       - id: level_name
         type: vstring
       - id: author
