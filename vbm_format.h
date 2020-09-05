@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        include/vbm_format.h
+*  FILE:        vbm_format.h
 *  PURPOSE:     VBM format documentation
-*  DEVELOPERS:  Rafal Harabien
+*  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 

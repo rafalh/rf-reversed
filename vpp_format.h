@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        include/vpp_format.h
+*  FILE:        vpp_format.h
 *  PURPOSE:     VPP format documentation
-*  DEVELOPERS:  Rafal Harabien
+*  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 

@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        include/rfproto.h
+*  FILE:        rfproto.h
 *  PURPOSE:     RF protocol documentation
-*  DEVELOPERS:  Rafal Harabien
+*  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 

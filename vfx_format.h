@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        include/vfx_format.h
+*  FILE:        vfx_format.h
 *  PURPOSE:     VFX format documentation
-*  DEVELOPERS:  Rafal Harabien
+*  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 

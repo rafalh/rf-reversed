@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        include/vf_format.h
+*  FILE:        vf_format.h
 *  PURPOSE:     VF (Volition Font) format documentation
-*  DEVELOPERS:  Rafal Harabien
+*  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 
