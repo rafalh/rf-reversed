@@ -10,9 +10,9 @@
 
 /**
  * VF is a proprietary Volition bitmap font file format used in Red Faction game.
- * 
+ *
  * Note: all fields are little-endian. On big-endian architecture bytes needs to be swapped.
- * 
+ *
  * Work is partially based on information from Roma Sorokin <sorok-roma@yandex.ru>
  **/
 
@@ -42,7 +42,7 @@ typedef struct _vf_header_t
     uint32_t    pixel_data_size;  // size of vf_file::pixels array
 } vf_header_t;
 
-typedef struct _vf_kern_pair_t 
+typedef struct _vf_kern_pair_t
 {
     uint8_t char_before_idx; // index of character before spacing
     uint8_t char_after_idx;  // index of character after spacing

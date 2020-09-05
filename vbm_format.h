@@ -14,7 +14,7 @@
  * VBM is a proprietary Volition image file format used in Red Faction game.
  * VBM files are either static (only one frame) or animated (multiple frames are included).
  * Each frame contains pixel data for one or more mipmap levels.
- * 
+ *
  * Note: all fields are little-endian. On big-endian architecture bytes needs to be swapped.
 **/
 

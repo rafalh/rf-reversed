@@ -79,7 +79,7 @@ vfx_matl_t
     float unk4[3];
     char unk5[];
     uint32_t cunk6;
-    
+
     char unknown4[];
 }
 
