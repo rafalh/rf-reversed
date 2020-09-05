@@ -669,8 +669,12 @@ struct RF_ObjectUpdate
 struct RF_ObjectUpdatePacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_OBJECT_UPDATE
+#ifdef PSEUDOCODE
     RF_ObjectUpdate objects[];         // Objects data
-    // uint32_t terminator = 0xFFFFFFFF;
+    uint32_t terminator = 0xFFFFFFFF;
+#else
+    char rest[];
+#endif
 };
 
 enum RF_ObjectKillFlags
