@@ -279,12 +279,12 @@ types:
       - id: tex_1
         type: material_texture
         if: type == material_type::double_texture
-      - id: anim_offset_old
+      - id: start_frame_old
         type: s4
-        if: _root.header.version < 0x30012
-      - id: anim_type_old
+        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version < 0x30012
+      - id: playback_mode_old
         type: s4
-        if: _root.header.version < 0x30012
+        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version < 0x30012
       - id: unk_0
         type: f4
         if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version >= 0x30007
@@ -466,10 +466,10 @@ types:
         repeat: expr
         repeat-expr: num_blend_factors
         if: type == material_type::double_texture and _root.header.version >= 0x30012
-      - id: anim_offset_old
+      - id: start_frame_old
         type: s4
         if: _root.header.version < 0x30012
-      - id: anim_type_old
+      - id: playback_mode_old
         type: s4
         if: _root.header.version < 0x30012
       - id: unk_0
@@ -1002,18 +1002,18 @@ types:
       - id: name
         type: strz
         doc: $original_map and $original_map_rgb have special meaning
-      - id: anim_offset
+      - id: start_frame
         type: s4
         if: _root.header.version >= 0x30012
         doc: usually 0, "Start Frame" in 3ds max / 2
-      - id: anim_speed
+      - id: playback_rate
         type: f4
         if: _root.header.version >= 0x30012
         doc: usually 1.0, "Playback Rate" in 3ds max
-      - id: anim_type
+      - id: playback_mode
         type: s4
         if: _root.header.version >= 0x30012
-        doc: usually 2
+        doc: 0 or 2 - loop frames, everything else - hold last frame
 
   vec3:
     doc: 3D vector
