@@ -288,8 +288,8 @@ struct v3d_submesh
     uint32_t num_lods;                     // number of levels of detail, must be in range 1 - 3
     float lod_distances[num_lods];         // minimal distance from object to camera for LOD to be used,
                                            // ascending order, example: [0, 10, 100]
-    float radius;                          // radius of bounding sphere
     struct v3d_vec3 offset;                // mesh offset in 3D space
+    float radius;                          // radius of bounding sphere
     struct v3d_aabb aabb;                  // axis-aligned bounding box
     struct v3d_submesh_lod lods[num_lods]; // level of detail meshes, most detailed first
     uint32_t num_materials;                // number of materials used by this submesh

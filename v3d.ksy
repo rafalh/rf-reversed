@@ -138,10 +138,10 @@ types:
         type: f4
         repeat: expr
         repeat-expr: num_lods
-      - id: radius
-        type: f4
       - id: offset
         type: vec3
+      - id: radius
+        type: f4
       - id: aabb
         type: aabb
       - id: lods
