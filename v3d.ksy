@@ -33,22 +33,22 @@ types:
         doc: number of submesh sections
       - id: num_all_vertices
         type: u4
-        doc: ccrunch resets to 0
+        doc: ccrunch resets value to 0
       - id: num_all_triangles
         type: u4
-        doc: ccrunch resets to 0
-      - id: unknown0
+        doc: ccrunch resets value to 0
+      - id: num_all_vertex_normals
         type: u4
-        doc: ccrunch resets to 0
+        doc: ccrunch resets value to 0
       - id: num_all_materials
         type: u4
         doc: total number of materials in all submeshes
-      - id: unknown2
+      - id: num_all_lods
         type: u4
-        doc: always 0 in game
-      - id: unknown3
+        doc: ccrunch resets value to 0
+      - id: num_dumbs
         type: u4
-        doc: always 0 in game
+        doc: ccrunch resets value to 0 (dumb sections are discarded)
       - id: num_colspheres
         type: u4
         doc: number of colsphere sections
@@ -158,6 +158,7 @@ types:
         type: u4
       - id: unknown1
         size: 28 * num_unknown1
+        doc: repeated submesh name and some additional numbers
   
   lod_mesh:
     seq:
@@ -348,8 +349,9 @@ types:
         type: quat
       - id: pos
         type: vec3
-      - id: unknown
+      - id: bone
         type: s4
+        doc: index of parent bone or -1
   
   texture:
     seq:
