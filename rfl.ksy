@@ -1426,11 +1426,11 @@ types:
         type: f4
       - id: decel_time
         type: f4
-      - id: trigger_uid
+      - id: event_uid
         type: s4
-      - id: contain_uid1
+      - id: item_uid1
         type: s4
-      - id: contain_uid2
+      - id: item_uid2
         type: s4
       - id: degrees_about_axis
         type: f4
@@ -2215,12 +2215,12 @@ enums:
     0:  team_1
     1:  team_2
   movement_type:
-    0: one_way
-    1: ping_pong_once
-    2: ping_pong_infinite
-    3: loop_once
-    4: loop_infinite
-    5: lift
+    1: one_way
+    2: ping_pong_once
+    3: ping_pong_infinite
+    4: loop_once
+    5: loop_infinite
+    6: lift
   room_effect_type:
     1: sky_room
     2: liquid_room
