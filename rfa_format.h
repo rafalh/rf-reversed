@@ -45,9 +45,9 @@ struct rfa_quaternion
 };
 
 // Quaternion (rotation in 3D space)
-struct rfa_quaternion_u16
+struct rfa_quaternion_i16
 {
-    uint16_t x, y, z, w;
+    int16_t x, y, z, w;
 };
 
 // Axis-aligned bounding box
@@ -61,16 +61,16 @@ struct rfa_aabb
 struct rfa_file_header
 {
     uint32_t signature; // always RFA_SIGNATURE
-    uint32_t version; // RFA_VERSION8 or RFA_VERSION7
+    int32_t version; // RFA_VERSION8 or RFA_VERSION7
     float unk; // delta
     float unk2; // epsilon
-    uint32_t start_time;
-    uint32_t end_time;
-    uint32_t num_bones;
+    int32_t start_time;
+    int32_t end_time;
+    int32_t num_bones;
     int32_t num_morph_vertices;
     int32_t num_morph_keyframes;
-    uint32_t ramp_in_time; // ramp in * 160
-    uint32_t ramp_out_time; // ramp out * 160
+    int32_t ramp_in_time; // ramp in * 160
+    int32_t ramp_out_time; // ramp out * 160
     struct rfa_quaternion unk3;
     struct rfa_vec3 unk4;
 };
@@ -78,8 +78,8 @@ struct rfa_file_header
 // Single keyframe of bone rotation animation
 struct rfa_rot_key // size = 4+4*2+4=16
 {
-    uint32_t time;
-    struct rfa_quaternion_u16 rot; // rotation at t=time
+    int32_t time;
+    struct rfa_quaternion_i16 rot; // rotation at t=time
     int8_t next_interp; // some interpolation factors
     int8_t prev_interp; // some interpolation factors
     int8_t unk3[2]; // always 0?
@@ -88,7 +88,7 @@ struct rfa_rot_key // size = 4+4*2+4=16
 // Single keyframe of bone position animation
 struct rfa_pos_key // size = 4+9*4=40
 {
-    uint32_t time;
+    int32_t time;
     struct rfa_vec3 pos; // position at t=time
     struct rfa_vec3 prev_interp; // used for interpolation before t=time
     struct rfa_vec3 next_interp; // used for interpolation after t=time
@@ -104,17 +104,17 @@ struct rfa_pos_key // size = 4+9*4=40
 struct rfa_offsets
 {
     // Offsets are relative to file beginning
-    uint32_t morph_vertices_offset; // offset to rfa_morph_vertices
-    uint32_t morph_keyframes_offset; // offset to rfa_morph_keyframes8 or rfa_morph_keyframes7
-    uint32_t bone_offsets[rfa_file_header::num_bones]; // offsets to rfa_bone
+    int32_t morph_vertices_offset; // offset to rfa_morph_vertices
+    int32_t morph_keyframes_offset; // offset to rfa_morph_keyframes8 or rfa_morph_keyframes7
+    int32_t bone_offsets[rfa_file_header::num_bones]; // offsets to rfa_bone
 };
 
 // Bone animation
 struct rfa_bone
 {
     float unk; // 0-255?
-    uint16_t num_rot_keys;
-    uint16_t num_pos_keys;
+    int16_t num_rot_keys;
+    int16_t num_pos_keys;
     struct rfa_rot_key rot_keys[num_rot_keys];
     struct rfa_pos_key pos_keys[num_pos_keys];
 };
@@ -122,13 +122,13 @@ struct rfa_bone
 // Morphed verices indices
 struct rfa_morph_vertices
 {
-    uint16_t vertex_indices[rfa_file_header::num_morph_vertices];
+    int16_t vertex_indices[rfa_file_header::num_morph_vertices];
 };
 
 // Vertices morph animation for file version 8
 struct rfa_morph_keyframes8
 {
-    uint32_t times[rfa_file_header::num_morph_keyframes];
+    int32_t times[rfa_file_header::num_morph_keyframes];
     if (rfa_file_header::num_morph_keyframes * rfa_file_header::num_morph_vertices > 0) {
         struct rfa_aabb aabb;
     }
