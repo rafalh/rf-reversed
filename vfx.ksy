@@ -22,72 +22,94 @@ types:
         contents: VSFX
       - id: version
         doc: minimal supported version is 0x30000
-        type: u4
+        type: s4
       - id: unk_0
-        type: u4
+        type: s4
         if: version >= 0x30008
       - id: end_frame
-        type: u4
+        type: s4
         doc: number of frames - 1 (15 frames per second)
-      - id: num_geometric_objects
-        type: u4
-        doc: meshes and splines
+      - id: num_meshes
+        type: s4
+        doc: meshes and chains
       - id: num_lights
-        type: u4
+        type: s4
       - id: num_dummies
-        type: u4
+        type: s4
       - id: num_particle_systems
-        type: u4
-      - id: num_space_warps
-        type: u4
+        type: s4
+      - id: num_spacewarps
+        type: s4
       - id: num_cameras
-        type: u4
-      - id: num_sels
-        type: u4
+        type: s4
+      - id: num_selsets
+        type: s4
         if: version >= 0x3000F
       - id: num_materials
-        type: u4
+        type: s4
         if: version >= 0x40000
-      - id: unk_1
-        type: u4
+      - id: num_mix_frames
+        type: s4
         if: version >= 0x40002
-      - id: unk_2
-        type: u4
+      - id: num_self_illumination_frames
+        type: s4
         if: version >= 0x40003
-      - id: unk_3
-        type: u4
+      - id: num_opacity_frames
+        type: s4
         if: version >= 0x40005
-      - id: unk_4
-        type: u4
+      - id: unk_1
+        type: s4
         if: version < 0x3000A
         doc: unused
-      - id: unk_5
-        type: u4
-        repeat: expr
-        repeat-expr: 5
-      - id: unk_6
-        type: u4
+      - id: num_faces
+        type: s4
+      - id: num_mesh_material_indices
+        type: s4
+      - id: num_vertex_normals
+        type: s4
+      - id: num_adjacent_faces
+        type: s4
+      - id: num_mesh_frames
+        type: s4
+      - id: num_uv_frames
+        type: s4
         if: version >= 0x3000D
-      - id: unk_7
-        type: u4
+      - id: num_mesh_transform_frames
+        type: s4
         if: version >= 0x30009
-        repeat: expr
-        repeat-expr: 5
-      - id: unk_8
-        type: u4
-        repeat: expr
-        repeat-expr: 5
-      - id: unk_9
-        type: u4
+      - id: num_mesh_transform_keyframe_lists
+        type: s4
+        if: version >= 0x30009
+      - id: num_mesh_translation_keys
+        type: s4
+        if: version >= 0x30009
+      - id: num_mesh_rotation_keys
+        type: s4
+        if: version >= 0x30009
+      - id: num_mesh_scale_keys
+        type: s4
+        if: version >= 0x30009
+      - id: num_light_frames
+        type: s4
+      - id: num_dummy_frames
+        type: s4
+      - id: num_part_sys_frames
+        type: s4
+      - id: num_spacewarp_frames
+        type: s4
+      - id: num_camera_frames
+        type: s4
+      - id: num_selset_objects
+        type: s4
         if: version >= 0x3000F
 
   section:
     seq:
       - id: type
-        type: u4
+        type: s4
         enum: section_type
       - id: len
-        type: u4
+        type: s4
         doc: length of section in bytes
       - id: body
         size: len - 4
@@ -96,12 +118,12 @@ types:
           cases:
             'section_type::mesh': mesh
             'section_type::material_modifier': material_modifier
-            'section_type::spline': spline
+            'section_type::chain': chain
             'section_type::particle_system': particle_system
             'section_type::material': material
             'section_type::camera': camera
             'section_type::light': light
-            'section_type::space_warp': space_warp
+            'section_type::spacewarp': spacewarp
             'section_type::dummy': dummy
 
   mesh:
@@ -111,27 +133,27 @@ types:
       - id: parent_name
         type: strz
         doc: '"Scene Root" or parent name in case of linked object'
-      - id: unk_0
+      - id: save_parent
         type: s1
         enum: bool
         doc: usually false, seems unused by the game engine
       - id: num_vertices
         type: s4
         doc: number of vertices?
-      - id: unk_1
+      - id: unk_0
         type: vec3
         repeat: expr
         repeat-expr: num_vertices
         if: _root.header.version < 0x3000A
         doc: positions perhaps, unused by the game engine
-      - id: num_triangles
+      - id: num_faces
         type: s4
-      - id: triangles
-        type: mesh_triangle
+      - id: faces
+        type: mesh_face
         repeat: expr
-        repeat-expr: num_triangles
-      - id: fps
-        type: u4
+        repeat-expr: num_faces
+      - id: frames_per_second
+        type: s4
         if: _root.header.version >= 0x30009
         doc: 15 by default
       - id: start_time
@@ -147,11 +169,11 @@ types:
       - id: start_frame
         type: s4
         if: _root.header.version < 0x40004
-        doc: start time divided by fps, affects mesh and blending factor animation
+        doc: start time divided by frames_per_second, affects mesh and blending factor animation
       - id: end_frame
         type: s4
         if: _root.header.version < 0x40004
-        doc: end time divided by fps, does not seem to be used by the game engine
+        doc: end time divided by frames_per_second, does not seem to be used by the game engine
       - id: num_materials
         type: s4
       - id: materials_indices
@@ -164,14 +186,14 @@ types:
         repeat: expr
         repeat-expr: num_materials
         if: _root.header.version < 0x40000
-      - id: center
+      - id: bounding_center
         type: vec3
         doc: bounding sphere offset?
-      - id: radius
+      - id: bounding_radius
         type: f4
         doc: bounding sphere radius
       - id: flags_old
-        type: u4
+        type: s4
         if: _root.header.version < 0x30002
       - id: flags
         type: mesh_flags
@@ -181,58 +203,58 @@ types:
       - id: facing_height
         type: f4
         if: flags.facing and _root.header.version == 0x3000A
-      - id: num_triangle_vertices
+      - id: num_face_vertices
         type: s4
-        doc: number of vertices?
-      - id: triangle_vertices
-        type: mesh_triangle_vertex
+      - id: face_vertices
+        type: mesh_face_vertex
         repeat: expr
-        repeat-expr: num_triangle_vertices
+        repeat-expr: num_face_vertices
+        doc: also called vertex_normal
       - id: is_keyframed
         type: u1
         enum: bool
         if: _root.header.version >= 0x30009
         doc: set to true unless its a morphed object or a child object
       - id: frames
-        type: mesh_frame(_index, num_vertices, num_triangles, flags.facing, flags.facing_rod, flags.morph, flags.dump_uvs, is_keyframed == bool::true)
+        type: mesh_frame(_index, num_vertices, num_faces, flags.facing, flags.facing_rod, flags.morph, flags.dump_uvs, is_keyframed == bool::true)
         repeat: expr
         repeat-expr: '_root.header.version >= 0x40004 ? num_frames : (_root.header.version >= 0x3000C ? end_frame - start_frame + 1 : end_frame - start_frame)'
-      - id: base_translation
+      - id: pivot_translation
         type: vec3
         if: is_keyframed == bool::true and _root.header.version >= 0x3000A
         doc: translation performed before keyframe transform
-      - id: base_rotation
+      - id: pivot_rotation
         type: quat
         if: is_keyframed == bool::true and _root.header.version >= 0x3000A
         doc: rotation performed before keyframe transform
-      - id: base_scale
+      - id: pivot_scale
         type: vec3
         if: is_keyframed == bool::true and _root.header.version >= 0x3000A
         doc: scale performed before keyframe transform, it seems exporter always writes [1, 1, 1]
+      - id: keyframes
+        type: mesh_keyframe_list
+        if: is_keyframed == bool::true
+
+  mesh_keyframe_list:
+    seq:
       - id: num_translation_keyframes
         type: s4
-        if: is_keyframed == bool::true
       - id: translation_keyframes
         type: vec3_keyframe
         repeat: expr
         repeat-expr: num_translation_keyframes
-        if: is_keyframed == bool::true
       - id: num_rotation_keyframes
         type: s4
-        if: is_keyframed == bool::true
       - id: rotation_keyframes
         type: quat_keyframe
         repeat: expr
         repeat-expr: num_rotation_keyframes
-        if: is_keyframed == bool::true
       - id: num_scale_keyframes
         type: s4
-        if: is_keyframed == bool::true
       - id: scale_keyframes
         type: vec3_keyframe
         repeat: expr
         repeat-expr: num_scale_keyframes
-        if: is_keyframed == bool::true
 
   mesh_flags:
     seq:
@@ -263,7 +285,7 @@ types:
   mesh_material_old:
     params:
       - id: num_frames
-        type: u4
+        type: s4
     seq:
       - id: type
         type: s4
@@ -271,50 +293,50 @@ types:
       - id: additive
         type: s1
         enum: bool
-        if: _root.header.version >= 0x30003 and (type == material_type::texture or type == material_type::double_texture)
+        if: _root.header.version >= 0x30003 and (type == material_type::image or type == material_type::vmix)
         doc: usually false, specified in Advanced Transparency section
       - id: tex_0
         type: material_texture
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
       - id: tex_1
         type: material_texture
-        if: type == material_type::double_texture
+        if: type == material_type::vmix
       - id: start_frame_old
         type: s4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version < 0x30012
-      - id: playback_mode_old
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version < 0x30012
+      - id: anim_type_old
         type: s4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version < 0x30012
-      - id: unk_0
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version < 0x30012
+      - id: specular_level
         type: f4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version >= 0x30007
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version >= 0x30007
         doc: usually 0.0, used for lighting
-      - id: unk_1
+      - id: glossiness
         type: f4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version >= 0x30007
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version >= 0x30007
         doc: usually 0.0, used for lighting
-      - id: ref_cof
+      - id: reflection_amount
         type: f4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version >= 0x30007
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version >= 0x30007
         doc: usually 0.0
-      - id: ref_tex_name
+      - id: refl_tex_name
         type: strz
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
         doc: usually empty string
-      - id: blend_factors
+      - id: mix_frames
         type: f4
         repeat: expr
         repeat-expr: num_frames
-        if: type == material_type::double_texture
+        if: type == material_type::vmix
       - id: solid_color
         type: rgb_s4
-        if: type == material_type::solid
+        if: type == material_type::color_only
       - id: self_illumination
         type: f4
         if: _root.header.version >= 0x30011
         doc: in range [0.0, 1.0]
 
-  mesh_triangle:
+  mesh_face:
     seq:
       - id: indices
         type: s4
@@ -331,49 +353,49 @@ types:
         repeat-expr: 3
       - id: normal
         type: vec3
-      - id: unk_0
+      - id: center
         type: vec3
-      - id: unk_1
+      - id: radius
         type: f4
-      - id: material_nr
+      - id: material_index
         type: s4
-      - id: unk_2
+      - id: smoothing_group
         type: s4
-      - id: triangle_vertex_indices
+      - id: face_vertex_indices
         type: s4
         repeat: expr
         repeat-expr: 3
     
-  mesh_triangle_vertex:
+  mesh_face_vertex:
     seq:
-      - id: unk_0
+      - id: smoothing_group
         type: s4
         doc: usually 1
-      - id: unk_1
+      - id: vertex_index
         type: s4
         doc: index in position array, purpose is unclear
-      - id: unk_2
+      - id: u
         type: f4
-        doc: looks like uninitialized data - 0xCDCDCDCD
-      - id: unk_3
+        doc: looks like uninitialized data - 0xCDCDCDCD, was used for U texture coordinate in ancient versions
+      - id: v
         type: f4
-        doc: looks like uninitialized data - 0xCDCDCDCD
-      - id: num_triangle_indices
+        doc: looks like uninitialized data - 0xCDCDCDCD, was used for V texture coordinate in ancient versions
+      - id: num_adjacent_faces
         type: s4
-      - id: triangle_indices
+      - id: adjacent_faces
         type: s4
         repeat: expr
-        repeat-expr: num_triangle_indices
-        doc: triangle indices, used for vertex normal calculation
+        repeat-expr: num_adjacent_faces
+        doc: face indices, used for vertex normal calculation
     
   mesh_frame:
     params:
       - id: index
-        type: u4
+        type: s4
       - id: num_vertices
-        type: u4
-      - id: num_triangles
-        type: u4
+        type: s4
+      - id: num_faces
+        type: s4
       - id: facing
         type: bool
       - id: facing_rod
@@ -399,19 +421,19 @@ types:
         repeat-expr: num_vertices
         doc: compressed positions, to uncompress multiply by positions_multiplier and add center
         if: morph or index == 0
-      - id: facing_width
+      - id: width
         type: f4
         if: (morph or index == 0) and (facing or facing_rod) and _root.header.version >= 0x3000B
-      - id: facing_height
+      - id: height
         type: f4
         if: (morph or index == 0) and (facing or facing_rod) and _root.header.version >= 0x3000B
-      - id: facing_rod_unk
+      - id: up_vector
         type: vec3
         if: (morph or index == 0) and facing_rod and index == 0 and _root.header.version >= 0x40001
       - id: uvs
         type: uv
         repeat: expr
-        repeat-expr: 3 * num_triangles
+        repeat-expr: 3 * num_faces
         if: (dump_uvs or index == 0) and _root.header.version >= 0x3000D
         doc: UV mapping, u from 3ds max, negated v from 3ds max
       - id: translation
@@ -435,7 +457,7 @@ types:
     doc: unknown purpose
     seq:
       - id: material_index
-        type: u4
+        type: s4
         if: _root.header.version >= 0x40000
       - id: material_old
         type: material_modifier_material_old
@@ -443,10 +465,10 @@ types:
 
   material_modifier_material_old:
     seq:
-      - id: fps
+      - id: frames_per_second
         type: s4
         if: _root.header.version >= 0x30009
-      - id: num_blend_factors
+      - id: num_mix_frames
         type: s4
       - id: type
         type: s4
@@ -460,42 +482,42 @@ types:
         type: material_texture
       - id: tex_1
         type: material_texture
-        if: type == material_type::double_texture
-      - id: blend_factors
+        if: type == material_type::vmix
+      - id: mix_frames
         type: f4
         repeat: expr
-        repeat-expr: num_blend_factors
-        if: type == material_type::double_texture and _root.header.version >= 0x30012
+        repeat-expr: num_mix_frames
+        if: type == material_type::vmix and _root.header.version >= 0x30012
       - id: start_frame_old
         type: s4
         if: _root.header.version < 0x30012
-      - id: playback_mode_old
+      - id: anim_type_old
         type: s4
         if: _root.header.version < 0x30012
-      - id: unk_0
+      - id: specular_level
         type: f4
         if: _root.header.version >= 0x30007
         doc: usually 0.0, used for lighting
-      - id: unk_1
+      - id: glossiness
         type: f4
         if: _root.header.version >= 0x30007
         doc: usually 0.0, used for lighting
-      - id: ref_cof
+      - id: reflection_amount
         type: f4
         if: _root.header.version >= 0x30007
         doc: usually 0.0
-      - id: ref_tex_name
+      - id: refl_tex_name
         type: strz
         doc: usually empty string
       - id: self_illumination
         type: f4
         if: _root.header.version >= 0x30012
         doc: in range [0.0, 1.0]
-      - id: blend_factors_old
+      - id: mix_frames_old
         type: f4
         repeat: expr
-        repeat-expr: num_blend_factors
-        if: type == material_type::double_texture and _root.header.version < 0x30012
+        repeat-expr: num_mix_frames
+        if: type == material_type::vmix and _root.header.version < 0x30012
 
   vec3_keyframe:
     seq:
@@ -504,10 +526,10 @@ types:
         doc: frame number * 320
       - id: value
         type: vec3
-      - id: unk_0
+      - id: in_tangent
         type: vec3
         doc: interpolation parameters perhaps
-      - id: unk_1
+      - id: out_tangent
         type: vec3
         doc: interpolation parameters perhaps
 
@@ -518,24 +540,30 @@ types:
         doc: frame number * 320
       - id: value
         type: quat
-      - id: unk_0
+      - id: tension
         type: f4
-        repeat: expr
-        repeat-expr: 5
-        doc: interpolation parameters perhaps
+      - id: continuity
+        type: f4
+      - id: bias
+        type: f4
+      - id: ease_in
+        type: f4
+      - id: ease_out
+        type: f4
 
-  spline:
+  chain:
+    doc: spline in 3ds max
     seq:
       - id: name
         type: strz
       - id: parent_name
         type: strz
-      - id: unk_0
+      - id: save_parent
         type: u1
         enum: bool
         doc: usually false, seems unused by the game engine
       - id: num_vertices
-        type: u4
+        type: s4
       - id: positions_old
         type: vec3
         repeat: expr
@@ -548,9 +576,9 @@ types:
         type: strz
         doc: glow texture file name, glow=filename in User Defined Properties in 3ds max
       - id: flags
-        type: spline_flags
-      - id: fps
-        type: u4
+        type: chain_flags
+      - id: frames_per_second
+        type: s4
         doc: 15 by default
       - id: start_time
         type: f4
@@ -559,20 +587,20 @@ types:
         type: f4
         if: _root.header.version >= 0x40004
       - id: num_frames
-        type: u4
+        type: s4
         if: _root.header.version >= 0x40004
       - id: start_frame
-        type: u4
+        type: s4
         if: _root.header.version < 0x40004
       - id: end_frame
-        type: u4
+        type: s4
         if: _root.header.version < 0x40004
       - id: is_keyframed
         type: u1
         enum: bool
         if: _root.header.version >= 0x30009
       - id: frames
-        type: spline_frame(_index, num_vertices, flags.morph, is_keyframed == bool::true)
+        type: chain_frame(_index, num_vertices, flags.morph, is_keyframed == bool::true)
         repeat: expr
         repeat-expr: '_root.header.version >= 0x40004 ? num_frames : (_root.header.version >= 0x3000C ? (end_frame - start_frame + 1) : (end_frame - start_frame))'
       - id: base_translation
@@ -612,7 +640,7 @@ types:
         repeat-expr: num_scale_keyframes
         if: is_keyframed == bool::true
 
-  spline_flags:
+  chain_flags:
     seq:
       - id: raw
         type: u4
@@ -624,12 +652,12 @@ types:
       fire:
         value: (raw & 0x00000008) != 0
 
-  spline_frame:
+  chain_frame:
     params:
       - id: index
-        type: u4
+        type: s4
       - id: num_vertices
-        type: u4
+        type: s4
       - id: morph
         type: bool
       - id: is_keyframed
@@ -658,7 +686,7 @@ types:
       - id: scale
         type: vec3
         if: not morph and (not is_keyframed or (_root.header.version < 0x3000E and index == 0))
-      - id: unk_0
+      - id: visible
         type: u1
         enum: bool
 
@@ -668,19 +696,23 @@ types:
         type: strz
       - id: parent_name
         type: strz
-      - id: unk_0
+      - id: save_parent
         type: u1
         enum: bool
-        doc: usually false
-      - id: transform
-        type: vec3_quat
-      - id: num_anim_transforms
-        type: u4
+        doc: usually false, unknown purpose
+      - id: pos
+        type: vec3
+        doc: position
+      - id: orient
+        type: quat
+        doc: orientation
+      - id: num_frames
+        type: s4
         doc: number of frames
-      - id: anim_transforms
+      - id: frames
         type: vec3_quat
         repeat: expr
-        repeat-expr: num_anim_transforms
+        repeat-expr: num_frames
 
   particle_system:
     seq:
@@ -688,10 +720,10 @@ types:
         type: strz
       - id: parent_name
         type: strz
-      - id: unk_0
+      - id: save_parent
         type: u1
         enum: bool
-        doc: usually false
+        doc: usually false, unknown purpose
       - id: flags
         type: particle_system_flags
         if: _root.header.version >= 0x30010
@@ -718,10 +750,10 @@ types:
       - id: start
         type: s4
         doc: Start in Timing section in 3ds max, in 1/15 of a second
-      - id: life
+      - id: lifetime
         type: s4
         doc: Life in Timing section in 3ds max * 320
-      - id: life_variation
+      - id: lifetime_variation
         type: f4
         doc: Life variation in Timing section in 3ds max
       - id: emitter_type
@@ -781,7 +813,7 @@ types:
   particle_system_material_old:
     params:
       - id: num_frames
-        type: u4
+        type: s4
       - id: drops
         type: bool
     seq:
@@ -792,25 +824,25 @@ types:
       - id: additive
         type: s1
         enum: bool
-        if: _root.header.version >= 0x30003 and (type == material_type::texture or type == material_type::double_texture)
+        if: _root.header.version >= 0x30003 and (type == material_type::image or type == material_type::vmix)
         doc: usually false, specified in Advanced Transparency section
       - id: tex_0_name
         type: strz
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
       - id: tex_0_playback_rate
         type: s4
-        if: (type == material_type::texture or type == material_type::double_texture) and _root.header.version >= 0x30012
+        if: (type == material_type::image or type == material_type::vmix) and _root.header.version >= 0x30012
       - id: tex_1_name
         type: strz
-        if: type == material_type::double_texture
+        if: type == material_type::vmix
       - id: tex_1_playback_rate
         type: s4
-        if: type == material_type::double_texture and _root.header.version >= 0x30012
-      - id: blend_factors
+        if: type == material_type::vmix and _root.header.version >= 0x30012
+      - id: mix_frames
         type: f4
         repeat: expr
         repeat-expr: num_frames
-        if: type == material_type::double_texture
+        if: type == material_type::vmix
       - id: solid_color
         type: rgb_s4
         if: drops
@@ -825,11 +857,11 @@ types:
         type: vec3
       - id: orient
         type: quat
-      - id: emitter_width
+      - id: width
         type: f4
-      - id: emitter_length
+      - id: height
         type: f4
-      - id: particle_size
+      - id: drop_size
         type: f4
       - id: speed
         type: f4
@@ -855,7 +887,7 @@ types:
         type: s4
       - id: end_frame
         type: s4
-      - id: transforms
+      - id: frames
         type: vec3_quat
         repeat: expr
         repeat-expr: '_root.header.version >= 0x3000E ? (end_frame - start_frame + 1) : (end_frame - start_frame)'
@@ -867,14 +899,14 @@ types:
         type: strz
       - id: parent_name
         type: strz
-      - id: unk_0
+      - id: save_parent
         type: u1
         enum: bool
-        doc: usually false
+        doc: usually false, unknown puprose
       - id: params
         type: light_params
       - id: num_frames
-        type: u4
+        type: s4
       - id: frames
         type: light_params
         repeat: expr
@@ -895,88 +927,93 @@ types:
         type: u1
         enum: bool
 
-  space_warp: 
+  spacewarp: 
     # Most force types crash the exporter. Motor and Push types do not crash but data looks weird so most likely it
     # works by chance. It is possible that RF uses its own force types because in vfx files because space warps are
-    # named VWind01 in vfx files (VWind could be a custom force type implemented in some not public Volition plugin)
+    # named VWind01 in vfx files (VWind could be a custom force type implemented in some non-public Volition plugin)
     seq:
       - id: name
         type: strz
       - id: parent_name
         type: strz
-      - id: unk_0
+      - id: type
         type: s4
-        doc: Basic Torque in case of Motor, Basic Force in case of Push
       - id: num_frames
         type: s4
-      - id: frame_data
-        type: space_warp_frame_data
+      - id: frames
+        type: spacewarp_frame
         repeat: expr
         repeat-expr: num_frames
   
-  space_warp_frame_data:
+  spacewarp_frame:
     seq:
       - id: pos
         type: vec3
       - id: orient
         type: quat
-      - id: unk_0
+      - id: strength
         type: f4
-        repeat: expr
-        repeat-expr: 5
+      - id: decay
+        type: f4
+      - id: turbulence
+        type: f4
+      - id: frequency
+        type: f4
+      - id: scale
+        type: f4
 
   material:
     seq:
       - id: type
         type: s4
         enum: material_type
-      - id: fps
+      - id: frames_per_second
         type: s4
         if: _root.header.version >= 0x40003
         doc: usually 15
       - id: additive
         type: s1
         enum: bool
-        if: type == material_type::texture or type == material_type::double_texture or _root.header.version >= 0x40006
+        if: type == material_type::image or type == material_type::vmix or _root.header.version >= 0x40006
         doc: usually false, specified in Advanced Transparency section
       - id: tex_0
         type: material_texture
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
       - id: tex_1
         type: material_texture
-        if: type == material_type::double_texture
-      - id: num_blend_factors
+        if: type == material_type::vmix
+      - id: num_mix_frames
         type: s4
-        if: type == material_type::double_texture
-      - id: fps_legacy
+        if: type == material_type::vmix
+      - id: frames_per_second_legacy
         type: s4
-        if: type == material_type::double_texture and _root.header.version < 0x40003
-        doc: same meaning as fps but used only in older versions
-      - id: blend_factors
+        if: type == material_type::vmix and _root.header.version < 0x40003
+        doc: same meaning as frames_per_second but used only in older versions
+      - id: mix_frames
         type: f4
         repeat: expr
-        repeat-expr: num_blend_factors
-        if: type == material_type::double_texture
+        repeat-expr: num_mix_frames
+        if: type == material_type::vmix
         doc: 0.0 - draw only tex_0, 1.0 - draw only tex_1, other values - blend tex_0 and tex_1
-      - id: unk_0
+      - id: specular_level
         type: f4
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
         doc: usually 0.0, used for lighting
-      - id: unk_1
+      - id: glossiness
         type: f4
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
         doc: usually 0.0, used for lighting
-      - id: ref_cof
+      - id: reflection_amount
         type: f4
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
         doc: usually 0.0
-      - id: ref_tex_name
+      - id: refl_tex_name
         type: strz
-        if: type == material_type::texture or type == material_type::double_texture
+        if: type == material_type::image or type == material_type::vmix
         doc: usually empty string
       - id: solid_color
         type: rgb_s4
-        if: type == material_type::solid
+        if: type == material_type::color_only
       - id: num_self_illumination
         type: s4
         if: _root.header.version >= 0x40003
@@ -1010,10 +1047,11 @@ types:
         type: f4
         if: _root.header.version >= 0x30012
         doc: usually 1.0, "Playback Rate" in 3ds max
-      - id: playback_mode
+      - id: anim_type
         type: s4
+        enum: anim_type
         if: _root.header.version >= 0x30012
-        doc: 0 or 2 - loop frames, everything else - hold last frame
+        doc: pingpong is not implemented in RF
 
   vec3:
     doc: 3D vector
@@ -1096,10 +1134,10 @@ enums:
     0x4F584653: mesh              # 'sfxo', observed in many RF PC files
     0x4C54414D: material          # 'matl', observed in many RF PC files
     0x54524150: particle_system   # 'part', observed in many RF PC files
-    0x534C4553: sels              # 'sels', not observed in RF PC files
+    0x534C4553: selset            # 'sels', not observed in RF PC files
     0x54474C41: light             # 'algt', observed in RF PC vfx files: Lil_RedEyeFlareLight
-    0x50524157: space_warp        # 'warp', observed in RF PC vfx files: NanoAttackMissile, Explosion_TorpedoHit, fish_death, Explosion_Sub, WaterSplash01
-    0x454E4843: spline            # 'chne', not observed in RF PC files
+    0x50524157: spacewarp         # 'warp', observed in RF PC vfx files: NanoAttackMissile, Explosion_TorpedoHit, fish_death, Explosion_Sub, WaterSplash01
+    0x454E4843: chain             # 'chne', not observed in RF PC files
     0x444F4D4D: material_modifier # 'mmod', object named '$material_modifier' in 3ds max, not observed in RF PC files
     0x41524D43: camera            # 'cmra', not observed in RF PC files
     0x594D4D44: dummy             # 'dmmy', observed in RF PC vfx files: CTFflag-red, CTFflag-blue, grabber_thrusterfx, fighter01, spike_thrusterfx, spiketribeam, Cutscene08_fx, Cutscene09_fx
@@ -1109,6 +1147,11 @@ enums:
     1: true
 
   material_type:
-    0: texture
-    1: double_texture
-    2: solid
+    0: image
+    1: vmix
+    2: color_only
+
+  anim_type:
+    0: loop
+    1: pingpong
+    2: once
