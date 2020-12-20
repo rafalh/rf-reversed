@@ -39,14 +39,14 @@ enum vbm_color_format_t
 
 struct vbm_header_t
 {
-    uint32_t signature;    // should be equal to VBM_SIGNATURE
-    uint32_t version;      // RF uses 1 and 2, makeVBM tool always creates files with version 1 */
-    uint32_t width;        // nominal image width
-    uint32_t height;       // nominal image height
-    uint32_t format;       // pixel data format, see vbm_color_format_t
-    uint32_t fps;          // frames per second, ignored if frames_count == 1
-    uint32_t num_frames;   // number of frames, always 1 for not animated VBM
-    uint32_t num_mipmaps;  // number of mipmap levels except for the full size (level 0)
+    int32_t signature;    // should be equal to VBM_SIGNATURE
+    int32_t version;      // RF uses 1 and 2, makeVBM tool always creates files with version 1 */
+    int32_t width;        // nominal image width
+    int32_t height;       // nominal image height
+    int32_t format;       // pixel data format, see vbm_color_format_t
+    int32_t fps;          // frames per second, ignored if frames_count == 1
+    int32_t num_frames;   // number of frames, always 1 for not animated VBM
+    int32_t num_mipmaps;  // number of mipmap levels except for the full size (level 0)
 };
 
 #if 0 // pseudocode

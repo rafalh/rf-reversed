@@ -27,16 +27,16 @@
 
 typedef struct _vpp_header_t
 {
-    uint32_t    signature;    /* VPP_SIGNATURE */
-    uint32_t    version;      /* 0x00000001 */
-    uint32_t    file_count;   /* Note: maximum number of files in archive is 65536 */
-    uint32_t    archive_size; /* Size of entire VPP */
+    uint32_t   signature;    /* VPP_SIGNATURE */
+    uint32_t   version;      /* 0x00000001 */
+    int32_t    file_count;   /* Note: maximum number of files in archive is 65536 */
+    int32_t    archive_size; /* Size of entire VPP */
 } vpp_header_t;
 
 typedef struct _vpp_entry_t
 {
-    char     file_name[60];
-    uint32_t file_size;
+    char    file_name[60];
+    int32_t file_size;
 } vpp_entry_t;
 
 #pragma pack(pop)

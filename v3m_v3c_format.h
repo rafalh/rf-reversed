@@ -34,24 +34,24 @@
 // Note: signature depends on file extension
 struct v3d_file_header
 {
-    uint32_t signature;         // always V3M_SIGNATURE or V3C_SIGNATURE
-    uint32_t version;           // always V3D_VERSION
-    uint32_t num_submeshes;     // number of submesh sections
-    uint32_t num_all_vertices;  // ccrunch resets to 0
-    uint32_t num_all_triangles; // ccrunch resets to 0
-    uint32_t unknown0;          // ccrunch resets to 0
-    uint32_t num_all_materials; // total number of materials in all submeshes, sum of v3d_submesh::num_materials
-                                // from all submesh sections
-    uint32_t unknown1;          // always 0 in game files
-    uint32_t unknown2;          // always 0 in game files
-    uint32_t num_colspheres;    // number of colsphere sections
+    int32_t signature;         // always V3M_SIGNATURE or V3C_SIGNATURE
+    int32_t version;           // always V3D_VERSION
+    int32_t num_submeshes;     // number of submesh sections
+    int32_t num_all_vertices;  // ccrunch resets to 0
+    int32_t num_all_triangles; // ccrunch resets to 0
+    int32_t unknown0;          // ccrunch resets to 0
+    int32_t num_all_materials; // total number of materials in all submeshes, sum of v3d_submesh::num_materials
+                               // from all submesh sections
+    int32_t unknown1;          // always 0 in game files
+    int32_t unknown2;          // always 0 in game files
+    int32_t num_colspheres;    // number of colsphere sections
 };
 
 // Header of V3D section
 struct v3d_section_header
 {
-    uint32_t type; // see v3d_section_type
-    uint32_t size; // size of data after section header - unused for V3M_SUBMESH
+    int32_t type; // see v3d_section_type
+    int32_t size; // size of data after section header - unused for V3M_SUBMESH
 };
 
 // Section type, see v3d_section_header
@@ -154,7 +154,7 @@ struct v3d_aabb
 struct v3d_batch_header
 {
     char reserved0[0x20];        // ignored by game engine (over-written in memory)
-    uint32_t texture_idx;        // texture index in v3d_submesh_lod::textures array
+    int32_t texture_idx;         // texture index in v3d_submesh_lod::textures array
     char reserved1[0x38 - 0x24]; // ignored by game engine (over-written in memory)
 };
 

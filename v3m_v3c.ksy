@@ -23,34 +23,34 @@ types:
   file_header:
     seq:
       - id: signature
-        type: u4
+        type: s4
         doc: file signature, value depends if this is V3C (character mesh) or V3M (static mesh), see is_v3m and is_v3c instances
       - id: version
         doc: always 0x40000
-        type: u4
+        type: s4
       - id: num_submeshes
-        type: u4
+        type: s4
         doc: number of submesh sections
       - id: num_all_vertices
-        type: u4
+        type: s4
         doc: ccrunch resets value to 0
       - id: num_all_triangles
-        type: u4
+        type: s4
         doc: ccrunch resets value to 0
       - id: num_all_vertex_normals
-        type: u4
+        type: s4
         doc: ccrunch resets value to 0
       - id: num_all_materials
-        type: u4
+        type: s4
         doc: total number of materials in all submeshes
       - id: num_all_lods
-        type: u4
+        type: s4
         doc: ccrunch resets value to 0
       - id: num_dumbs
-        type: u4
+        type: s4
         doc: ccrunch resets value to 0 (dumb sections are discarded)
       - id: num_colspheres
-        type: u4
+        type: s4
         doc: number of colsphere sections
     instances:
       is_v3m:
@@ -63,10 +63,10 @@ types:
   section:
     seq:
       - id: type
-        type: u4
+        type: s4
         enum: section_type
       - id: len
-        type: u4
+        type: s4
         doc: length of section in bytes, unused in submesh section
       - id: body
         #size: len
@@ -131,9 +131,9 @@ types:
         type: strz
         size: 24
       - id: version
-        type: u4
+        type: s4
       - id: num_lods
-        type: u4
+        type: s4
       - id: lod_distances
         type: f4
         repeat: expr
@@ -149,13 +149,13 @@ types:
         repeat: expr
         repeat-expr: num_lods
       - id: num_materials
-        type: u4
+        type: s4
       - id: materials
         type: material
         repeat: expr
         repeat-expr: num_materials
       - id: num_unknown1
-        type: u4
+        type: s4
       - id: unknown1
         size: 28 * num_unknown1
         doc: repeated submesh name and some additional numbers
@@ -166,11 +166,11 @@ types:
         type: lod_mesh_flags
         size: 4
       - id: num_vertices
-        type: u4
+        type: s4
       - id: num_batches
         type: u2
       - id: data_size
-        type: u4
+        type: s4
       - id: raw_data
         type: raw_lod_mesh_data
         size: data_size
@@ -181,9 +181,9 @@ types:
         repeat: expr
         repeat-expr: num_batches
       - id: num_prop_points
-        type: u4
+        type: s4
       - id: num_textures
-        type: u4
+        type: s4
       - id: textures
         type: texture
         repeat: expr
@@ -270,14 +270,14 @@ types:
       - id: unknown0
         size: 0x20
       - id: texture_idx
-        type: u4
+        type: s4
       - id: unknown1
         size: 0x14
   
   mesh_batch_data:
     params:
       - id: batch_idx
-        type: u4
+        type: s4
     seq:
       - id: positions
         type: vec3
@@ -419,7 +419,7 @@ types:
   bones:
     seq:
       - id: num_bones
-        type: u4
+        type: s4
         doc: number of bones (max 50)
       - id: bones
         type: bone
