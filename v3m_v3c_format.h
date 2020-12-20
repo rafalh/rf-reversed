@@ -2,21 +2,21 @@
 *
 *  PROJECT:     Open Faction
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        v3d_format.h
-*  PURPOSE:     V3D format specification (v3m/v3c)
+*  FILE:        v3m_v3c_format.h
+*  PURPOSE:     V3M/V3C format specification
 *  DEVELOPERS:  Rafał Harabień
 *
 *****************************************************************************/
 
-// V3D is a 3D modelling format used by Red Faction game.
-// RF mesh files have two extensions: .v3m and .v3c - they share file structure (V3D format).
+// V3M and V3C are a 3D modelling formats used by the Red Faction game engine.
+// RF mesh files have two extensions: .v3m and .v3c - they share most of the file structure.
 // V3M is used for static meshes. It does not have bones or collision spheres.
-// V3C is used for character meshes. It usually has bones and collision spheres.
+// VCM is used for character meshes. It usually has bones and collision spheres.
 // See v3d_file for top level file structure.
-// Note: V3D format uses little-endian encoding. If you use big-endian architecture conversion is necessary.
+// Note: V3M/V3C format uses little-endian encoding. If you use big-endian architecture conversion is necessary.
 
-#ifndef V3D_FORMAT_H_INCLUDED
-#define V3D_FORMAT_H_INCLUDED
+#ifndef V3M_V3C_FORMAT_H_INCLUDED
+#define V3M_V3C_FORMAT_H_INCLUDED
 
 #include <stdint.h>
 
@@ -341,4 +341,4 @@ struct v3d_file
 
 #pragma pack(pop)
 
-#endif // V3D_FORMAT_H_INCLUDED
+#endif // V3M_V3C_FORMAT_H_INCLUDED

@@ -1,5 +1,5 @@
-# V3D format reverse engineered by:
-# * Rafal Harabien (Open Faction project)
+# V3M/V3C format reverse engineered by:
+# * Rafał Harabień (Open Faction project)
 meta:
   id: v3m
   title: Red Faction Mesh
