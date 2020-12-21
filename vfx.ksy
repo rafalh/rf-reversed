@@ -23,7 +23,7 @@ types:
       - id: version
         doc: minimal supported version is 0x30000
         type: s4
-      - id: unk_0
+      - id: flags
         type: s4
         if: version >= 0x30008
       - id: end_frame
@@ -31,77 +31,104 @@ types:
         doc: number of frames - 1 (15 frames per second)
       - id: num_meshes
         type: s4
-        doc: meshes and chains
+        doc: total number of meshes and chains in this file, used for memory allocation
       - id: num_lights
         type: s4
+        doc: total number of lights in this file, used for memory allocation
       - id: num_dummies
         type: s4
+        doc: total number of dummies in this file, used for memory allocation
       - id: num_particle_systems
         type: s4
+        doc: total number of particle systems in this file, used for memory allocation
       - id: num_spacewarps
         type: s4
+        doc: total number of spacewarps in this file, used for memory allocation
       - id: num_cameras
         type: s4
+        doc: total number of cameras in this file, used for memory allocation
       - id: num_selsets
         type: s4
         if: version >= 0x3000F
+        doc: total number of spacewarps in this file, used for memory allocation
       - id: num_materials
         type: s4
         if: version >= 0x40000
+        doc: total number of materials in this file, used for memory allocation
       - id: num_mix_frames
         type: s4
         if: version >= 0x40002
+        doc: total number of mix frames in all materials, used for memory allocation
       - id: num_self_illumination_frames
         type: s4
         if: version >= 0x40003
+        doc: total number of self illumination frames in all materials, used for memory allocation
       - id: num_opacity_frames
         type: s4
         if: version >= 0x40005
+        doc: total number of opacity frames in all materials, used for memory allocation
       - id: unk_1
         type: s4
         if: version < 0x3000A
         doc: unused
       - id: num_faces
         type: s4
+        doc: total number of faces in all meshes, used for memory allocation
       - id: num_mesh_material_indices
         type: s4
+        doc: total number of material indices in all meshes, used for memory allocation
       - id: num_vertex_normals
         type: s4
+        doc: total number of mesh_face_vertex objects in all meshes, used for memory allocation
       - id: num_adjacent_faces
         type: s4
+        doc: total number of all adjacent faces in all mesh_face_vertex objects in all meshes, used for memory allocation
       - id: num_mesh_frames
         type: s4
+        doc: total number of mesh frames in all meshes, used for memory allocation
       - id: num_uv_frames
         type: s4
         if: version >= 0x3000D
+        doc: total number of uv frames in all meshes, used for memory allocation
       - id: num_mesh_transform_frames
         type: s4
         if: version >= 0x30009
+        doc: total number of mesh transform frames in all meshes (mesh frames with transformations), used for memory allocation
       - id: num_mesh_transform_keyframe_lists
         type: s4
         if: version >= 0x30009
+        doc: total number of mesh_transform_keyframe_list in all meshes, used for memory allocation
       - id: num_mesh_translation_keys
         type: s4
         if: version >= 0x30009
+        doc: total number of translation keys in all mesh_transform_keyframe_list objects, used for memory allocation
       - id: num_mesh_rotation_keys
         type: s4
         if: version >= 0x30009
+        doc: total number of rotation keys in all mesh_transform_keyframe_list objects, used for memory allocation
       - id: num_mesh_scale_keys
         type: s4
         if: version >= 0x30009
+        doc: total number of scale keys in all mesh_transform_keyframe_list objects, used for memory allocation
       - id: num_light_frames
         type: s4
+        doc: total number of light frames in all lights, used for memory allocation
       - id: num_dummy_frames
         type: s4
+        doc: total number of dummy frames in all dummies, used for memory allocation
       - id: num_part_sys_frames
         type: s4
+        doc: total number of particle system frames in all particle systems, used for memory allocation
       - id: num_spacewarp_frames
         type: s4
+        doc: total number of spacewarp frames in all spacewarps, used for memory allocation
       - id: num_camera_frames
         type: s4
+        doc: total number of camera frames in all cameras, used for memory allocation
       - id: num_selset_objects
         type: s4
         if: version >= 0x3000F
+        doc: total number of selset objects in this file, used for memory allocation
 
   section:
     seq:
@@ -139,7 +166,7 @@ types:
         doc: usually false, seems unused by the game engine
       - id: num_vertices
         type: s4
-        doc: number of vertices?
+        doc: number of vertices
       - id: unk_0
         type: vec3
         repeat: expr
@@ -188,7 +215,7 @@ types:
         if: _root.header.version < 0x40000
       - id: bounding_center
         type: vec3
-        doc: bounding sphere offset?
+        doc: bounding sphere center
       - id: bounding_radius
         type: f4
         doc: bounding sphere radius
@@ -197,10 +224,10 @@ types:
         if: _root.header.version < 0x30002
       - id: flags
         type: mesh_flags
-      - id: facing_width
+      - id: width
         type: f4
         if: flags.facing and _root.header.version == 0x3000A
-      - id: facing_height
+      - id: height
         type: f4
         if: flags.facing and _root.header.version == 0x3000A
       - id: num_face_vertices
@@ -232,10 +259,10 @@ types:
         if: is_keyframed == bool::true and _root.header.version >= 0x3000A
         doc: scale performed before keyframe transform, it seems exporter always writes [1, 1, 1]
       - id: keyframes
-        type: mesh_keyframe_list
+        type: mesh_transform_keyframe_list
         if: is_keyframed == bool::true
 
-  mesh_keyframe_list:
+  mesh_transform_keyframe_list:
     seq:
       - id: num_translation_keyframes
         type: s4
