@@ -62,17 +62,17 @@ struct rfa_file_header
 {
     uint32_t signature; // always RFA_SIGNATURE
     int32_t version; // RFA_VERSION8 or RFA_VERSION7
-    float unk; // delta
-    float unk2; // epsilon
-    int32_t start_time;
-    int32_t end_time;
+    float pos_reduction; // delta, unknown purpose, seems unused by the game engine
+    float rot_reduction; // epsilon, unknown purpose, seems unused by the game engine
+    int32_t start_time; // animation start time in 1/4800 s
+    int32_t end_time; // animation end time in 1/4800 s
     int32_t num_bones;
     int32_t num_morph_vertices;
     int32_t num_morph_keyframes;
-    int32_t ramp_in_time; // ramp in * 160
-    int32_t ramp_out_time; // ramp out * 160
-    struct rfa_quaternion unk3;
-    struct rfa_vec3 unk4;
+    int32_t ramp_in_time; // ramp in * 160, seems unused by the game engine
+    int32_t ramp_out_time; // ramp out * 160, seems unused by the game engine
+    struct rfa_quaternion total_rotation; // unknown purpose, seems unused by the game engine
+    struct rfa_vec3 total_translation; // unknown purpose, seems unused by the game engine
 };
 
 // Single keyframe of bone rotation animation
@@ -80,9 +80,9 @@ struct rfa_rot_key // size = 4+4*2+4=16
 {
     int32_t time;
     struct rfa_quaternion_i16 rot; // rotation at t=time
-    int8_t next_interp; // some interpolation factors
-    int8_t prev_interp; // some interpolation factors
-    int8_t unk3[2]; // always 0?
+    int8_t ease_in; // used for interpolation before t=time
+    int8_t ease_out; // used for interpolation after t=time
+    int16_t padding; // always 0?
 };
 
 // Single keyframe of bone position animation
@@ -90,8 +90,8 @@ struct rfa_pos_key // size = 4+9*4=40
 {
     int32_t time;
     struct rfa_vec3 pos; // position at t=time
-    struct rfa_vec3 prev_interp; // used for interpolation before t=time
-    struct rfa_vec3 next_interp; // used for interpolation after t=time
+    struct rfa_vec3 in_tangent; // used for interpolation before t=time
+    struct rfa_vec3 out_tangent; // used for interpolation after t=time
 };
 
 // Note:
@@ -112,7 +112,7 @@ struct rfa_offsets
 // Bone animation
 struct rfa_bone
 {
-    float unk; // 0-255?
+    float weight; // 0-255?
     int16_t num_rot_keys;
     int16_t num_pos_keys;
     struct rfa_rot_key rot_keys[num_rot_keys];
