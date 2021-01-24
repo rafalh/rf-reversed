@@ -3,10 +3,10 @@ meta:
   id: vfx
   title: Red Faction Effect
   application: Red Faction
+  file-extension: vfx
+  license: GPL-3.0-or-later
   encoding: ASCII
   endian: le
-  license: GPL-3.0-or-later
-  file-extension: vfx
 
 seq:
   - id: header
@@ -18,7 +18,7 @@ seq:
 types:
   file_header:
     seq:
-      - id: signature
+      - id: magic
         contents: VSFX
       - id: version
         doc: minimal supported version is 0x30000

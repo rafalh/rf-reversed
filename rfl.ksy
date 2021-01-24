@@ -5,9 +5,9 @@ meta:
   id: rfl
   title: Red Faction Level
   application: Red Faction
-  endian: le
-  license: GPL-3.0-or-later
   file-extension: rfl
+  license: GPL-3.0-or-later
+  endian: le
 seq:
   - id: header
     type: file_header
@@ -18,7 +18,7 @@ seq:
 types:
   file_header:
     seq:
-      - id: signature
+      - id: magic
         contents: [0x55, 0xDA, 0xBA, 0xD4]
       - id: version
         doc: 0xC8 is the last supported version in RF 1.2, standard PC levels use version 0xB4, PS2 levels use versions 0xAE and 0xAF
@@ -99,8 +99,8 @@ types:
       - id: len
         type: u2
       - id: str
-        type: str
         size: len
+        type: str
         encoding: ASCII
   vec3:
     doc: 3D vector

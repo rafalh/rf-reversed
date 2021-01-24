@@ -1,15 +1,15 @@
 # V3M/V3C format reverse engineered by:
 # * Rafał Harabień (Open Faction project)
 meta:
-  id: v3m
+  id: v3m_v3c
   title: Red Faction Mesh
   application: Red Faction
-  encoding: ASCII
-  endian: le
-  license: GPL-3.0-or-later
   file-extension:
     - v3m
     - v3c
+  license: GPL-3.0-or-later
+  encoding: ASCII
+  endian: le
 
 seq:
   - id: header
@@ -22,7 +22,7 @@ seq:
 types:
   file_header:
     seq:
-      - id: signature
+      - id: magic
         type: s4
         doc: file signature, value depends if this is V3C (character mesh) or V3M (static mesh), see is_v3m and is_v3c instances
       - id: version
@@ -54,10 +54,10 @@ types:
         doc: number of colsphere sections
     instances:
       is_v3m:
-        value: signature == 0x52463344
+        value: magic == 0x52463344
         doc: static mesh
       is_v3c:
-        value: signature == 0x5246434D
+        value: magic == 0x5246434D
         doc: character mesh
   
   section:
@@ -125,11 +125,11 @@ types:
   submesh:
     seq:
       - id: name
-        type: strz
         size: 24
+        type: strz
       - id: unknown0
-        type: strz
         size: 24
+        type: strz
       - id: version
         type: s4
       - id: num_lods
@@ -163,8 +163,8 @@ types:
   lod_mesh:
     seq:
       - id: flags
-        type: lod_mesh_flags
         size: 4
+        type: lod_mesh_flags
       - id: num_vertices
         type: s4
       - id: num_batches
@@ -172,8 +172,8 @@ types:
       - id: data_size
         type: s4
       - id: raw_data
-        type: raw_lod_mesh_data
         size: data_size
+        type: raw_lod_mesh_data
       - id: unknown1
         type: s4
       - id: batch_info
@@ -190,10 +190,10 @@ types:
         repeat-expr: num_textures
     instances:
       data:
-        type: lod_mesh_data
         io: raw_data._io
         pos: 0
         size-eos: true
+        type: lod_mesh_data
   
   lod_mesh_flags:
     seq:
@@ -343,8 +343,8 @@ types:
   prop_point:
     seq:
       - id: name
-        type: strz
         size: 0x44
+        type: strz
       - id: rot
         type: quat
       - id: pos
@@ -384,8 +384,8 @@ types:
   material:
     seq:
       - id: diffuse_map_name
-        type: strz
         size: 32
+        type: strz
       - id: emissive_factor
         type: f4
       - id: unknown
@@ -395,16 +395,16 @@ types:
       - id: ref_cof
         type: f4
       - id: ref_map_name
-        type: strz
         size: 32
+        type: strz
       - id: flags
         type: u4
 
   colsphere:
     seq:
       - id: name
-        type: strz
         size: 24
+        type: strz
         doc: collision sphere name
       - id: bone
         type: s4
@@ -430,8 +430,8 @@ types:
   bone:
     seq:
       - id: name
-        type: strz
         size: 24
+        type: strz
         doc: bone name, used by game
       - id: rot
         type: quat
