@@ -539,7 +539,7 @@ enum RF_Weapon
     RF_SHOTGUN                   = 0x05,
     RF_SNIPER_RIFLE              = 0x06,
     RF_ROCKET_LAUNCHER           = 0x07,
-    RF_ASSOULT_RIFLE             = 0x08,
+    RF_ASSAULT_RIFLE             = 0x08,
     RF_SUBMACHINE_GUN            = 0x09,
     RF_SUBMACHINE_GUN_SPECIAL    = 0x0A, // not supported in RF multiplayer
     RF_GRENADE                   = 0x0B,
