@@ -27,6 +27,7 @@
 #define RF_MAX_PASSWORD_LEN 22
 #define RF_TRACKER_HOST "rf.thqmultiplay.net"
 #define RF_TRACKER_PORT 18444
+#define RF_CONNECT_SEQ 0x142
 
 /**
  * Main Packet type
@@ -118,40 +119,40 @@ struct RF_GamePacketHeader
 
 enum RF_ReliablePacketType
 {
-    RF_RPT_REPLY   = 0x00,
-    RF_RPT_PACKETS = 0x01,
-    RF_RPT_JOIN_03 = 0x03,
-    RF_RPT_JOIN_06 = 0x06,
-    RF_RPT_JOIN_05 = 0x05,
+    RF_RPT_ACK        = 0x00,  // acknowladges other reliable packet, can be send by server and client
+    RF_RPT_DATA       = 0x01,  // wraps multiple game packets, can be send by server and client
+    RF_RPT_REQ_CONN   = 0x03,  // sent by client when initiating a reliable connection
+    RF_RPT_DISCONNECT = 0x04,  // sent by server to close the connection
+    RF_RPT_HEARTBEAT  = 0x05,  // sent after 10 seconds of not sending anything
+    RF_RPT_I_AM_HERE  = 0x06,  // sent by client after RF_RPT_REQ_CONN is acknowledged
 };
 
 /**
  * Reliable packet
  * Used for delivering ordered reliable packets. It has first byte set to RF_RELIABLE.
  */
-struct RF_ReliablePacket
+struct RF_ReliablePacketHeader
 {
-    uint8_t type;    // usually RF_RPT_PACKETS
-    uint8_t unknown;
-    uint16_t id;     // Packet ID
-    uint16_t len;    // Length of data
-    uint32_t ticks;  // Milliseconds since client/server start
-    uint8_t data[];
+    uint8_t type;        // See RF_ReliablePacketType
+    uint8_t unknown;     // Unused (set to 0)
+    int16_t seq;        // Packet sequence number (first packet uses RF_CONNECT_SEQ)
+    int16_t data_len;   // Length of data
+    int32_t send_time;  // Milliseconds since client/server start
 };
 
 /**
- * Synchronization reply packet
- * Special type of packet. It has first byte set to 01.
+ * Acknowledge reliable packet
+ * Used to acknowledge delivery of other reliable packets. It has first byte set to RF_RELIABLE.
  */
-struct RF_ReliableReplyPacket
+struct RF_ReliableAckPacket
 {
-    uint8_t type;       // RF_RPT_REPLY
-    uint8_t unknown;    // 0x00
-    uint16_t unknown2;  // 0x0000
-    uint16_t len;       // 0x0004
-    uint32_t ticks;     // cn from packet which reply is for
-    uint16_t packet_id; // n from packet which reply is for
-    uint16_t unknown3;  // 0x0000
+    // Header:
+    //   type - RF_RPT_ACK
+    //   seq - unused (set to 0)
+    //   data_len - 4
+    //   send_time - send_time from packet which is being acknowledged
+    struct RF_ReliablePacketHeader header;
+    int32_t ack_seq;  // seq from packet which is being acknowledged (Note: field size does not match - blame V.)
 };
 
 enum RF_ProtocolVersion
@@ -178,15 +179,15 @@ enum RF_ServerFlags
 struct RF_GameInfoPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_GAME_INFO
-    uint8_t version;                   // Supported version of protocol
+    uint8_t version;                   // Protocol version (see RF_ProtocolVersion)
 #ifdef PSEUDOCODE
     char name[];                       // Server name
-    uint8_t game_type;                 // Game type (RF_DM, RF_TEAMDM, RF_CTF)
-    uint8_t players_count;             // Players count on the server
-    uint8_t max_players_count;         // Maximal players count on the server
-    char level[];                      // Map name
+    uint8_t game_type;                 // Game type (see RF_GameType)
+    uint8_t num_players;               // Number of players currently playing
+    uint8_t max_players;               // Maximal number of players that can join this server
+    char level[];                      // Level name
     char mod[];                        // MOD activated on the server
-    uint8_t flags;                     // Bitfield (RF_SF_*) *
+    uint8_t flags;                     // Bitfield (see RF_ServerFlags)
 #else
     char rest[];
 #endif
@@ -195,22 +196,22 @@ struct RF_GameInfoPacket
 struct RF_JoinRequestPacket
 {
     struct RF_GamePacketHeader header;    // RF_GPT_JOIN_REQUEST
-    uint8_t version;                      // Supported version of protocol
+    uint8_t version;                      // Protocol version (see RF_ProtocolVersion)
 #ifdef PSEUDOCODE
     char name[];
     uint32_t entity_type;                 // 0x5
     char password[];
     uint32_t rate;                        // connection speed in bytes/second
     if (version==RF_VER_10_11) {
-        uint32_t meshes_vpp_checksum;
-        uint32_t meshes_vpp_size;
-        uint32_t motions_vpp_checksum;
-        uint32_t motions_vpp_size;
+        uint32_t meshes_packfile_checksum;
+        uint32_t meshes_packfile_size;
+        uint32_t motions_packfile_checksum;
+        uint32_t motions_packfile_size;
     }
-    uint32_t tables_vpp_checksum;         // not a public algorithm, for 1.2 it's 7e 40 c2 1a
-    uint32_t tables_vpp_size;             // Size of tables.vpp
-    uint32_t mod_vpp_checksum;            // Checksum of mod VPP if exists (modname.vpp)
-    uint32_t mod_vpp_size;                // Size of mod VPP if exists (modname.vpp)
+    uint32_t tables_packfile_checksum;    // Checksum of tables.vpp, unknown algorithm, for 1.2 it's 7e 40 c2 1a
+    uint32_t tables_packfile_size;        // Size of tables.vpp
+    uint32_t mod_packfile_checksum;       // Checksum of mod VPP if exists (modname.vpp)
+    uint32_t mod_packfile_size;           // Size of mod VPP if exists (modname.vpp)
     /*struct RF_JoinEx joinEx;*/
 #else
     char rest[];
@@ -226,7 +227,6 @@ struct RF_JoinAcceptPacket
 #else
     char rest[];
 #endif
-    /**/
 };
 
 enum RF_GameOptions
@@ -288,19 +288,22 @@ struct RF_NewPlayerPacket
     char name[];                       // Player name
 };
 
+enum RF_TeamId
+{
+    RF_TEAM_RED  = 0,
+    RF_TEAM_BLUE = 1,
+};
+
 struct RF_Player
 {
-    uint8_t flags;
+    uint8_t end_marker; // always 0 (used to determine end of players data)
     uint8_t id;
 #ifdef PSEUDOCODE
-    if (flags & 1) {
-        uint32_t unknown; // Example of content: 50 00 00 3B
-    }
-    uint32_t unknown2; // 08, 01
+    uint32_t flags;    // Bitfield (see RF_PlayerFlags)
     uint32_t ip;       // Player IP address
     uint16_t port;     // Player port
     char name[];       // Player name
-    uint8_t team;      // Team (0 - red, 1 - blue)
+    uint8_t team;      // Team (see RF_TeamId)
 #else
     char rest[];
 #endif
@@ -311,29 +314,29 @@ struct RF_PlayersPacket
     struct RF_GamePacketHeader header; // RF_GPT_PLAYERS
 #ifdef PSEUDOCODE
     struct RF_Player players[];
-    uint8_t unknown; // 02
+    uint8_t end_marker; // 1 if there are more packets, 2 if this is the last players packet in sequence
 #else
     char rest[];
 #endif
 };
 
-enum RF_LeftReason
+enum RF_LeftGameReason
 {
-    RF_LR_UNKNOWN           = 0x00,
-    RF_LR_NORMAL            = 0x01,
-    RF_LR_KICKED            = 0x02,
-    RF_LR_DATA_INCOMPATIBLE = 0x04, // Note: received when PF wants to download map (?)
-    RF_LR_BETWEEN_LEVELS    = 0x05,
-    RF_LR_EMPTY             = 0x06, // TODO: check if it's polish translation bug
-    RF_LR_NO_LEVEL_FILE     = 0x07,
-    // Note: other reasons shows the same message as RF_LR_UNKNOWN
+    RF_LGR_UNKNOWN           = 0x00,
+    RF_LGR_NORMAL            = 0x01,
+    RF_LGR_KICKED            = 0x02,
+    RF_LGR_DATA_INCOMPATIBLE = 0x04,
+    RF_LGR_BETWEEN_LEVELS    = 0x05,
+    RF_LGR_EMPTY             = 0x06, // Message is missing in strings.tbl
+    RF_LGR_NO_LEVEL_FILE     = 0x07,
+    // Note: other reasons shows the same message as RF_LGR_UNKNOWN
 };
 
 struct RF_LeftGamePacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_LEFT_GAME
     uint8_t player_id;                 // Player ID
-    uint8_t reason;                    // Reason of leaving
+    uint8_t reason;                    // Reason of leaving (see RF_LeftGameReason)
 };
 
 struct RF_StateInfoRequestPacket
@@ -362,7 +365,7 @@ struct RF_ChatLinePacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_CHAT_LINE
     uint8_t player_id;                 // Player ID of sender
-    uint8_t is_team_msg;               // 0 - global message, 1 - team message
+    uint8_t mode;                      // 0 - global message, 1 - team message
     char message[];                    // Message content
 };
 
@@ -395,24 +398,23 @@ struct RF_TeamChangePacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_TEAM_CHANGE
     uint8_t player_id;                 // Player ID
-    uint8_t team;                      // Team (0 - red, 1 - blue)
+    uint8_t team;                      // Team (see RF_TeamId)
 };
 
 struct RF_PlayerStats
 {
     uint8_t player_id; // Player ID
     uint16_t ping;     // Player ping
-    uint8_t unknown;   // Ie. 0xFF
+    uint8_t obj_update_packet_loss; // Value in range 0 - 255
     int16_t score;     // Player score (points from kills and captures)
-    uint8_t captures;  // Captured flags
-    uint8_t unknown2;  // Ie. 0x00
+    int16_t captures;  // Captured flags
 };
 
 struct RF_NetgameUpdatePacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_NETGAME_UPDATE
     uint8_t unknown;                   // 0x07
-    uint8_t player_count;              // Player count
+    uint8_t num_players;               // Player count
 #ifdef PSEUDOCODE
     struct RF_PlayerStats players[];
     float level_time;                  // Time since level start
@@ -440,7 +442,7 @@ struct RF_ClutterKillPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_CLUTTER_KILL
     uint32_t uid;                      // Clutter UID
-    uint32_t unknown;                  // reason? (0 - melee/energy, 1 - normal fire, 2 - continous fire, 3 - boom)
+    uint32_t damage_type;              // Damage type (0 - melee/energy, 1 - normal fire, 2 - continous fire, 3 - boom)
 };
 
 struct RF_CtfFlagPickedUpPacket
@@ -454,7 +456,7 @@ struct RF_CtfFlagPickedUpPacket
 struct RF_CtfFlagCapturedPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_CTF_FLAG_CAPTURED
-    uint8_t team;                      // Team which has captured the flag (0 - red, 1 - blue)
+    uint8_t team;                      // Team which has captured the flag (see RF_TeamId)
     uint8_t player_id;                 // Player Id of flag thief
     uint8_t flags_red;                 // Red team score after capture
     uint8_t flags_blue;                // Blue team score after capture
@@ -488,7 +490,7 @@ struct RF_CtfFlagUpdatePacket
 struct RF_CtfFlagReturnedPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_CTF_FLAG_RETURNED
-    uint8_t team;                      // Team which has stolen the flag (0 - red, 1 - blue)
+    uint8_t team;                      // Team which has stolen the flag (see RF_TeamId)
     uint8_t player_id;                 // Player ID
     uint8_t flags_red;                 // Red team score
     uint8_t flags_blue;                // Blue team score
@@ -509,7 +511,7 @@ struct RF_Matrix
 struct RF_CtfFlagDropedPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_CTF_FLAG_DROPED
-    uint8_t team;                      // Team which has stolen the flag (0 - red, 1 - blue)
+    uint8_t team;                      // Team which has stolen the flag (see RF_TeamId)
     uint8_t flags_red;                 // Red team score
     uint8_t flags_blue;                // Blue team score
     struct RF_Vector pos;              // Position of the flag
@@ -696,11 +698,11 @@ struct RF_ObjectKillPacket
 struct RF_ItemApplyPacket
 {
     struct RF_GamePacketHeader header; // RF_GPT_ITEM_APPLY
-    uint32_t item_handle;              // Item handle
-    uint32_t entity_handle;            // Entity handle
-    uint32_t weapon;                   // Weapon type, 0xFFFFFFFF if no weapon is given
-    uint32_t ammo;                     // Ammunition in current magazine or 0xFFFFFFFF
-    uint32_t clip_ammo;                // Ammunition in other magazines or 0xFFFFFFFF
+    int32_t item_handle;               // Item handle
+    int32_t entity_handle;             // Entity handle
+    int32_t weapon;                    // Weapon type, -1 if no weapon is given
+    int32_t clip_ammo;                 // Ammunition in current magazine or -1
+    int32_t ammo;                      // Ammunition in other magazines or -1
 };
 
 struct RF_EntityCreatePacket
@@ -718,16 +720,16 @@ struct RF_EntityCreatePacket
 
 struct RF_EntityCreatePacketRest
 {
-    uint8_t team;            // 0 - red, 1 - blue
-    uint8_t entity_type;     // Usually 0x5 (miner1)
-    uint32_t entity_handle;  // Object ID
-    uint32_t unknown2;       // Ie. 0xFFFFFFFF
-    struct RF_Vector pos;    // position vector
-    struct RF_Matrix orient; // orientation (rotation matrix)
-    uint8_t player_id;       // Player ID, probably 0xFF if entity is not player
-    uint32_t character;      // Entity character (index in pc_multi.tbl)
-    uint32_t weapon;         // Entity weapon
-    uint32_t unknown3;       // Ie. 0xFFFFFFFF
+    uint8_t team;             // Team (see RF_TeamId)
+    uint8_t entity_type;      // Usually 0x5 (miner1)
+    int32_t entity_handle;    // Object ID
+    int32_t parent_handle;    // Always -1 (unused)
+    struct RF_Vector pos;     // position vector
+    struct RF_Matrix orient;  // orientation (rotation matrix)
+    uint8_t player_id;        // Player ID, probably 0xFF if entity is not player
+    uint32_t character;       // Entity character (index in pc_multi.tbl)
+    int32_t primary_weapon;   // Entity weapon
+    int32_t secondary_weapon; // Always -1 (unused)
 };
 
 struct RF_ItemCreatePacket
@@ -735,7 +737,7 @@ struct RF_ItemCreatePacket
     struct RF_GamePacketHeader header; // RF_GPT_ITEM_CREATE
 #ifdef PSEUDOCODE
     char script_name[];                // Zero-terminated string
-    uint8_t unknown;                   // Ie. 00
+    uint8_t team;                      // Always 0 (unused?)
     uint32_t item_type;                // Item type ID (entry number in items.tbl)
     uint32_t respawn_time;             // Item respawn time in ms (0xFFFFFFFF if item is temporary)
     uint32_t count;                    // $Count or $Count Multi from items.tbl (not value from RFL)
@@ -820,8 +822,8 @@ struct RF_GlassKillPacket
     struct RF_GamePacketHeader header; // RF_GPT_GLASS_KILL
     int32_t room_id;                   // 0x7FFFFFFF - index starting from 1
     uint8_t explosion;                 // 1 or 0
-    struct RF_Vector pos;              // destruction start pos
-    float unknown[3];                  // 0.0f if explosion == 1
+    struct RF_Vector hit_pos;          // destruction start pos
+    struct RF_Vector hit_dir;          // 0.0f if explosion == 1
 };
 
 
