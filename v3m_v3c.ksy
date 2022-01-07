@@ -212,10 +212,10 @@ types:
       - id: unk_8
         type: b1
         doc: value & 0x8
-      - id: unk_4
+      - id: reflection
         type: b1
         doc: value & 0x4
-      - id: unk_2
+      - id: character
         type: b1
         doc: value & 0x2
       - id: morph_vertices_map
@@ -433,15 +433,15 @@ types:
         size: 24
         type: strz
         doc: bone name, used by game
-      - id: rot
+      - id: base_rotation
         type: quat
-        doc: quaternion
-      - id: pos
+        doc: rotation part of inverse bone matrix (model to bone transformation), seems inverted (RF bug?)
+      - id: base_translation
         type: vec3
-        doc: bone to model translation
-      - id: parent
+        doc: translation part of inverse bone matrix (model to bone transformation)
+      - id: parent_index
         type: s4
-        doc: index of parent bone (-1 for root)
+        doc: index of parent bone, -1 for root bone
 
 enums:
   section_type:

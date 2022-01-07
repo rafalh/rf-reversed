@@ -171,7 +171,8 @@ struct v3d_lod_prop
 enum v3d_lod_flags
 {
     V3D_LOD_MORPH_VERTICES_MAP = 0x01, // include morph vertices mapping in v3d_batch_data, used by characters
-    V3D_LOD_FLAG_2             = 0x02, // unknown, used by characters
+    V3D_LOD_FLAG_CHARACTER     = 0x02, // set for characters
+    V3D_LOD_FLAG_REFLECTION    = 0x04, // mesh uses reflecting materials
     V3D_LOD_FLAG_10            = 0x10, // use most detailed LOD for collisions instead of least detailed, used by driller01.v3m
     V3D_LOD_TRIANGLE_PLANES    = 0x20, // causes v3d_batch_data::planes to be included, used by static meshes,
                                        // should be set if any triangle does not have V3D_TRI_DOUBLE_SIDED flag
