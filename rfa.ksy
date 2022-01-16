@@ -23,9 +23,11 @@ instances:
     type: s2
     repeat: expr
     repeat-expr: header.num_morph_vertices
+    doc: mapping of morphed vertices indices from this animation to mesh vertices
   morph_vert_data:
     pos: header.morph_vert_data_offset
     type: morph_vert_data
+    doc: morphing data, used for facial animations, e.g. for speaking
 
 types:
   file_header:
@@ -43,7 +45,9 @@ types:
         doc: epsilon, unknown purpose, seems unused by the game engine
       - id: start_time
         type: s4
-        doc: animation start time in 1/4800 s
+        doc: |
+          animation start time in 1/4800 s, when the animation is activated current time is initialized to this value
+          so it is basically duration to cut from the beginning of the animation
       - id: end_time
         type: s4
         doc: animation end time in 1/4800 s
@@ -55,10 +59,14 @@ types:
         type: s4
       - id: ramp_in_time
         type: s4
-        doc: ramp in * 160, seems unused by the game engine
+        doc: |
+          duration of period immediately after animation start during which weights of all bones are lineary interpolated
+          from 0 to their nominal value, used only for action animations, in 1/4800 s
       - id: ramp_out_time
         type: s4
-        doc: ramp out * 160, seems unused by the game engine
+        doc: |
+          duration of period immediately before animation end during which weights of all bones are lineary interpolated
+          from their nominal value to 0, used only for action animations, in 1/4800 s
       - id: total_rotation
         type: quat
         doc: unknown purpose, seems unused by the game engine
@@ -73,9 +81,9 @@ types:
         type: s4
         repeat: expr
         repeat-expr: num_bones
-  
+
   vec3:
-    doc: 3D vector
+    doc: 3D vector with float components
     seq:
       - id: x
         type: f4
@@ -85,7 +93,7 @@ types:
         type: f4
 
   short_vec3:
-    doc: 3D vector
+    doc: 3D vector with signed char components
     seq:
       - id: x
         type: s1
@@ -95,7 +103,7 @@ types:
         type: s1
 
   quat:
-    doc: 3D quaternion
+    doc: quaternion with float components
     seq:
       - id: x
         type: f4
@@ -107,6 +115,7 @@ types:
         type: f4
 
   short_quat:
+    doc: quaternion with signed short int components
     seq:
       - id: x
         type: s2
@@ -121,7 +130,11 @@ types:
     seq:
       - id: weight
         type: f4
-        doc: determines importance of the animation for this bone, used for mixing multiple animations together
+        doc: |
+          determines importance of the animation for this bone,
+          used for mixing multiple animations together,
+          in case of action animation value of 10 fully cancels state animation influence,
+          should be in range 1-10
       - id: num_rotation_keys
         type: s2
       - id: num_translation_keys
@@ -139,26 +152,34 @@ types:
     seq:
       - id: time
         type: s4
+        doc: keyframe time in 1/4800 s
       - id: rotation
         type: short_quat
-        doc: seems inverted (RF bug?)
+        doc: rotation in this keyframe, seems inverted (RF bug?)
       - id: ease_in
         type: s1
+        doc: used in unknown interpolation algorithm
       - id: ease_out
         type: s1
+        doc: used in unknown interpolation algorithm
       - id: pad
         type: s2
+        doc: unused, makes structure 32-bit aligned
 
   translation_key:
     seq:
       - id: time
         type: s4
+        doc: keyframe time in 1/4800 s
       - id: translation
         type: vec3
+        doc: translation in this keyframe
       - id: in_tangent
         type: vec3
+        doc: Bezier interpolation in tangent
       - id: out_tangent
         type: vec3
+        doc: Bezier interpolation out tangent
 
   morph_vert_data:
     seq:
