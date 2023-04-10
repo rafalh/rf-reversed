@@ -14,10 +14,10 @@ meta:
 seq:
   - id: header
     type: file_header
-  - id: sections
-    type: section
+  - id: chunks
+    type: file_chunk
     repeat: until
-    repeat-until: _.type == section_type::end
+    repeat-until: _.type == file_chunk_type::end
 
 types:
   file_header:
@@ -30,28 +30,28 @@ types:
         type: s4
       - id: num_submeshes
         type: s4
-        doc: number of submesh sections
-      - id: num_all_vertices
+        doc: number of submesh chunks
+      - id: num_vertices
         type: s4
         doc: ccrunch resets value to 0
-      - id: num_all_triangles
+      - id: num_mesh_faces
         type: s4
         doc: ccrunch resets value to 0
-      - id: num_all_vertex_normals
+      - id: num_mesh_normals
         type: s4
         doc: ccrunch resets value to 0
-      - id: num_all_materials
+      - id: num_mesh_materials
         type: s4
         doc: total number of materials in all submeshes
-      - id: num_all_lods
+      - id: num_lod_meshes
         type: s4
         doc: ccrunch resets value to 0
       - id: num_dumbs
         type: s4
-        doc: ccrunch resets value to 0 (dumb sections are discarded)
-      - id: num_colspheres
+        doc: ccrunch resets value to 0 (dumb chunks are discarded)
+      - id: num_cspheres
         type: s4
-        doc: number of colsphere sections
+        doc: number of csphere chunks
     instances:
       is_v3m:
         value: magic == 0x52463344
@@ -60,22 +60,22 @@ types:
         value: magic == 0x5246434D
         doc: character mesh
   
-  section:
+  file_chunk:
     seq:
       - id: type
         type: s4
-        enum: section_type
+        enum: file_chunk_type
       - id: len
         type: s4
-        doc: length of section in bytes, unused in submesh section
+        doc: length of chunk in bytes, unused in submesh chunk
       - id: body
         #size: len
         type:
           switch-on: type
           cases:
-            'section_type::submesh': submesh
-            'section_type::colsphere': colsphere
-            'section_type::bones': bones
+            'file_chunk_type::submesh': submesh
+            'file_chunk_type::csphere': csphere
+            'file_chunk_type::bones': bones
   
   vec3:
     doc: 3D vector
@@ -114,44 +114,46 @@ types:
       - id: dist
         type: f4
   
-  aabb:
+  bbox:
     doc: axis aligned bounding box
     seq:
-      - id: p1
+      - id: min
         type: vec3
-      - id: p2
+      - id: max
         type: vec3
   
   submesh:
+    doc: LOD mesh group
     seq:
       - id: name
         size: 24
         type: strz
-      - id: unknown0
+      - id: parent_name
         size: 24
         type: strz
+        doc: unused by the game
       - id: version
         type: s4
-      - id: num_lods
+      - id: num_levels
         type: s4
-      - id: lod_distances
+      - id: distances
         type: f4
         repeat: expr
-        repeat-expr: num_lods
+        repeat-expr: num_levels
       - id: offset
         type: vec3
       - id: radius
         type: f4
-      - id: aabb
-        type: aabb
-      - id: lods
+      - id: bbox
+        type: bbox
+      - id: meshes
         type: lod_mesh
         repeat: expr
-        repeat-expr: num_lods
+        repeat-expr: num_levels
       - id: num_materials
         type: s4
       - id: materials
-        type: material
+        type: mesh_material
         repeat: expr
         repeat-expr: num_materials
       - id: num_unknown1
@@ -165,21 +167,22 @@ types:
       - id: flags
         size: 4
         type: lod_mesh_flags
-      - id: num_vertices
+      - id: num_vecs
         type: s4
-      - id: num_batches
+        doc: number of vertices
+      - id: num_chunks
         type: u2
-      - id: data_size
+      - id: data_block_size
         type: s4
-      - id: raw_data
-        size: data_size
+      - id: data_block
+        size: data_block_size
         type: raw_lod_mesh_data
       - id: unknown1
         type: s4
-      - id: batch_info
-        type: batch_info
+      - id: chunk_info
+        type: chunk_info
         repeat: expr
-        repeat-expr: num_batches
+        repeat-expr: num_chunks
       - id: num_prop_points
         type: s4
       - id: num_textures
@@ -190,7 +193,7 @@ types:
         repeat-expr: num_textures
     instances:
       data:
-        io: raw_data._io
+        io: data_block._io
         pos: 0
         size-eos: true
         type: lod_mesh_data
@@ -203,7 +206,7 @@ types:
       - id: unk_40
         type: b1
         doc: value & 0x40
-      - id: triangle_planes
+      - id: face_planes
         type: b1
         doc: value & 0x20
       - id: unk_10
@@ -218,7 +221,7 @@ types:
       - id: character
         type: b1
         doc: value & 0x2
-      - id: morph_vertices_map
+      - id: orig_map
         type: b1
         doc: value & 0x1
   
@@ -227,37 +230,37 @@ types:
       - id: raw_data
         size-eos: true
   
-  batch_info:
+  chunk_info:
     seq:
       - id: num_vertices
         type: u2
-      - id: num_triangles
+      - id: num_faces
         type: u2
-      - id: positions_size
+      - id: vecs_alloc
         type: u2
-      - id: indices_size
+      - id: faces_alloc
         type: u2
-      - id: same_pos_vertex_offsets_size
+      - id: same_pos_vertex_offsets_alloc
         type: u2
-      - id: bone_links_size
+      - id: wi_alloc
         type: u2
-      - id: tex_coords_size
+      - id: uvs_alloc
         type: u2
       - id: render_flags
         type: u4
   
   lod_mesh_data:
     seq:
-      - id: batch_headers
-        type: mesh_batch_header
+      - id: chunk_headers
+        type: mesh_chunk_header
         repeat: expr
-        repeat-expr: _parent.num_batches
+        repeat-expr: _parent.num_chunks
       - id: padding0
         size: (0x10 - _io.pos) % 0x10
-      - id: batch_data
-        type: mesh_batch_data(_index)
+      - id: chunk_data
+        type: mesh_chunk_data(_index)
         repeat: expr
-        repeat-expr: _parent.num_batches
+        repeat-expr: _parent.num_chunks
       - id: padding1
         size: (0x10 - _io.pos) % 0x10
       - id: prop_points
@@ -265,7 +268,7 @@ types:
         repeat: expr
         repeat-expr: _parent.num_prop_points
 
-  mesh_batch_header:
+  mesh_chunk_header:
     seq:
       - id: unknown0
         size: 0x20
@@ -274,84 +277,88 @@ types:
       - id: unknown1
         size: 0x14
   
-  mesh_batch_data:
+  mesh_chunk_data:
     params:
-      - id: batch_idx
+      - id: chunk_index
         type: s4
     seq:
-      - id: positions
+      - id: vecs
         type: vec3
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_vertices
-        repeat-expr: _parent._parent.batch_info[batch_idx].positions_size / 12
+        repeat-expr: _parent._parent.chunk_info[chunk_index].vecs_alloc / 12
+        doc: vertex positions
       - id: padding0
         size: (0x10 - _parent._io.pos) % 0x10
-      - id: normals
+      - id: norms
         type: vec3
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_vertices
-        repeat-expr: _parent._parent.batch_info[batch_idx].positions_size / 12
+        repeat-expr: _parent._parent.chunk_info[chunk_index].vecs_alloc / 12
+        doc: vertex normals
       - id: padding1
         size: (0x10 - _parent._io.pos) % 0x10
-      - id: tex_coords
+      - id: uvs
         type: uv
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_vertices
-        repeat-expr: _parent._parent.batch_info[batch_idx].tex_coords_size / 8
+        repeat-expr: _parent._parent.chunk_info[chunk_index].uvs_alloc / 8
+        doc: texture coordinates
       - id: padding2
         size: (0x10 - _parent._io.pos) % 0x10
-      - id: triangles
-        type: triangle
+      - id: faces
+        type: face
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_triangles
-        repeat-expr: _parent._parent.batch_info[batch_idx].indices_size / 8
+        repeat-expr: _parent._parent.chunk_info[chunk_index].faces_alloc / 8
       - id: padding3
         size: (0x10 - _parent._io.pos) % 0x10
       - id: planes
         type: plane
-        if: _parent._parent.flags.triangle_planes
+        if: _parent._parent.flags.face_planes
         repeat: expr
-        repeat-expr: _parent._parent.batch_info[batch_idx].num_triangles
+        repeat-expr: _parent._parent.chunk_info[chunk_index].num_faces
+        doc: face planes used for culling
       - id: padding4
         size: (0x10 - _parent._io.pos) % 0x10
-        if: _parent._parent.flags.triangle_planes
+        if: _parent._parent.flags.face_planes
       - id: same_pos_vertex_offsets
         type: s2
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_vertices
-        repeat-expr: _parent._parent.batch_info[batch_idx].same_pos_vertex_offsets_size / 2
+        repeat-expr: _parent._parent.chunk_info[chunk_index].same_pos_vertex_offsets_alloc / 2
+        doc: |
+          used for face clipping optimization
+          if value is positive:
+          vecs[i] == vecs[i - same_pos_vertex_offsets[i]]
       - id: padding5
         size: (0x10 - _parent._io.pos) % 0x10
-      - id: bone_links
-        type: vertex_bones
-        if: _parent._parent.batch_info[batch_idx].bone_links_size > 0
+      - id: wi
+        type: weight_index_array
+        if: _parent._parent.chunk_info[chunk_index].wi_alloc > 0
         repeat: expr
-        #repeat-expr: _parent._parent.batch_info[batch_idx].num_vertices
-        repeat-expr: _parent._parent.batch_info[batch_idx].bone_links_size / 8
+        repeat-expr: _parent._parent.chunk_info[chunk_index].wi_alloc / 8
+        doc: bone weights for vertices
       - id: padding6
         size: (0x10 - _parent._io.pos) % 0x10
-        if: _parent._parent.batch_info[batch_idx].bone_links_size > 0
-      - id: morph_vertices_map
+        if: _parent._parent.chunk_info[chunk_index].wi_alloc > 0
+      - id: orig_map
         type: s2
-        if: _parent._parent.flags.morph_vertices_map
+        if: _parent._parent.flags.orig_map
         repeat: expr
-        repeat-expr: _parent._parent.num_vertices
+        repeat-expr: _parent._parent.num_vecs
+        doc: mapping to original vertex indices, needed for a morphing animation
       - id: padding7
         size: (0x10 - _parent._io.pos) % 0x10
-        if: _parent._parent.flags.morph_vertices_map
+        if: _parent._parent.flags.orig_map
   
   prop_point:
     seq:
       - id: name
         size: 0x44
         type: strz
-      - id: rot
+      - id: orient
         type: quat
       - id: pos
         type: vec3
-      - id: bone
+      - id: parent_index
         type: s4
-        doc: index of parent bone or -1
+        doc: parent bone index or -1
   
   texture:
     seq:
@@ -360,7 +367,8 @@ types:
       - id: filename
         type: strz
 
-  triangle:
+  face:
+    doc: triangle
     seq:
       - id: indices
         type: u2
@@ -370,45 +378,52 @@ types:
         type: u2
         doc: 0x20 - double-sided (disables back-face culling)
 
-  vertex_bones:
+  weight_index_array:
     seq:
       - id: weights
         type: u1
         repeat: expr
         repeat-expr: 4
-      - id: bones
+        doc: bone weigths (0-255)
+      - id: indices
         type: u1
         repeat: expr
         repeat-expr: 4
+        doc: bone indices
 
-  material:
+  mesh_material:
     seq:
-      - id: diffuse_map_name
+      - id: tex_name
         size: 32
         type: strz
-      - id: emissive_factor
+      - id: self_illumination
         type: f4
-      - id: unknown
+      - id: specular_level
         type: f4
-        repeat: expr
-        repeat-expr: 2
-      - id: ref_cof
+        doc: not used on PC
+      - id: glossiness
         type: f4
-      - id: ref_map_name
+        doc: not used on PC
+      - id: reflection_amount
+        type: f4
+        doc: not used on PC
+      - id: refl_tex_name
         size: 32
         type: strz
+        doc: not used on PC
       - id: flags
         type: u4
 
-  colsphere:
+  csphere:
+    doc: collision sphere
     seq:
       - id: name
         size: 24
         type: strz
         doc: collision sphere name
-      - id: bone
+      - id: parent_index
         type: s4
-        doc: bone index or -1
+        doc: parent bone index or -1
       - id: pos
         type: vec3
         doc: center position relative to bone
@@ -444,9 +459,9 @@ types:
         doc: index of parent bone, -1 for root bone
 
 enums:
-  section_type:
+  file_chunk_type:
     0x00000000: end
     0x5355424D: submesh
-    0x43535048: colsphere
+    0x43535048: csphere
     0x424F4E45: bones
     0x44554D42: dumb

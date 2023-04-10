@@ -34,15 +34,16 @@ types:
     seq:
       - id: magic
         contents: [0x56, 0x4D, 0x56, 0x46]
+        doc: character string 'VMVF' (Volition Movement File)
       - id: version
         type: s4
-        doc: 8 or 7
+        doc: only version 7 and 8 are supported by the game and this specification
       - id: pos_reduction
         type: f4
-        doc: delta, unknown purpose, seems unused by the game engine
+        doc: pos reduction factor used in mvfreduce execution, unused by the game
       - id: rot_reduction
         type: f4
-        doc: epsilon, unknown purpose, seems unused by the game engine
+        doc: rot reduction factor used in mvfreduce execution, unused by the game
       - id: start_time
         type: s4
         doc: |
@@ -69,18 +70,21 @@ types:
           from their nominal value to 0, used only for action animations, in 1/4800 s
       - id: total_rotation
         type: quat
-        doc: unknown purpose, seems unused by the game engine
+        doc: root bone total rotation delta, unused by the game
       - id: total_translation
         type: vec3
-        doc: unknown purpose, seems unused by the game engine
+        doc: root bone total translation delta, unused by the game
       - id: morph_vert_mappings_offset
         type: s4
+        doc: absolute offset of morph_vert_mappings
       - id: morph_vert_data_offset
         type: s4
+        doc: absolute offset of morph_vert_data
       - id: bone_offsets
         type: s4
         repeat: expr
         repeat-expr: num_bones
+        doc: absolute offsets of bones
 
   vec3:
     doc: 3D vector with float components
@@ -158,10 +162,10 @@ types:
         doc: rotation in this keyframe, seems inverted (RF bug?)
       - id: ease_in
         type: s1
-        doc: used in unknown interpolation algorithm
+        doc: Ease To TCB rotation controller parameter
       - id: ease_out
         type: s1
-        doc: used in unknown interpolation algorithm
+        doc: Ease From TCB rotation controller parameter
       - id: pad
         type: s2
         doc: unused, makes structure 32-bit aligned

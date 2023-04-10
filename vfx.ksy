@@ -21,7 +21,7 @@ types:
       - id: magic
         contents: VSFX
       - id: version
-        doc: minimal supported version is 0x30000
+        doc: minimal supported version is 0x30000 but the game uses 0x30008+
         type: s4
       - id: flags
         type: s4
@@ -386,6 +386,9 @@ types:
         type: f4
       - id: material_index
         type: s4
+        doc: |
+          in version >= 0x40000 it is 0-based index for materials_indices array or -1 in case of no material
+          in version < 0x40000 it is 1-based index in materials array
       - id: smoothing_group
         type: s4
       - id: face_vertex_indices
