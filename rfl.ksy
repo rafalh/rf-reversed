@@ -190,7 +190,7 @@ types:
         doc: 1 or 0
       - id: is_subroom
         type: u1
-        doc: 1 or 0
+        doc: 1 or 0, 1 for details and for floating geometry in rooms
       - id: has_alpha
         type: u1
         doc: 1 or 0, 1 if any face has texture with alpha channel, updated by RED only if brush has is_detail flag
@@ -281,6 +281,7 @@ types:
         doc: each bit controls one smoothing group
       - id: room_index
         type: s4
+        doc: index in geometry::rooms array in solid geometry, -1 in movers
       - id: num_vertices
         type: s4
       - id: vertices
